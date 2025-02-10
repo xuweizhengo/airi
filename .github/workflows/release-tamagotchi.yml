@@ -6,8 +6,22 @@ on:
       - 'tamagotchi/v*'
 
 jobs:
+  remove-version-prefix:
+    name: Remove Version Prefix
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Remove Version Prefix
+        run: |
+          version=$(echo "${{ github.ref_name }}" | sed 's/tamagotchi\/v//')
+          echo "Version: $version"
+          echo "VERSION=$version" >> $GITHUB_ENV
+
   build-tamagotchi:
     name: Build Tamagotchi
+    needs: remove-version-prefix
     strategy:
       matrix:
         include:
@@ -28,7 +42,7 @@ jobs:
             arch: arm64
             artifact: AppImage
           - os: windows-latest
-            platform: windows
+            platform: win
             arch: x64
             artifact: exe
     runs-on: ${{ matrix.os }}
@@ -74,8 +88,8 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: airi-${{ matrix.platform }}-${{ matrix.arch }}-${{ github.ref_name }}
-          path: packages/stage-tamagotchi/dist/airi-${{ matrix.platform }}-${{ matrix.arch }}-${{ github.ref_name }}.${{ matrix.artifact }}
+          name: airi-${{ matrix.platform }}-${{ matrix.arch }}-${{ env.VERSION }}
+          path: packages/stage-tamagotchi/dist/airi-${{ matrix.platform }}-${{ matrix.arch }}-${{ env.VERSION }}.${{ matrix.artifact }}
 
   release-tamagotchi:
     name: Release Tamagotchi
@@ -94,7 +108,7 @@ jobs:
       - run: ls -la dist
 
       - name: Upload To GitHub Releases
-        uses: actions/upload-release-asset@v4
+        uses: softprops/action-gh-release@v2
         with:
-          file-glob: dist/airi-*
-          release-name: stage-tamagotchi-${{ github.ref_name }}
+          files: dist/airi-*
+          generate-release-notes: true
