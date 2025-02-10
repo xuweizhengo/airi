@@ -6,19 +6,6 @@ on:
       - 'tamagotchi/v*'
 
 jobs:
-  remove-version-prefix:
-    name: Remove Version Prefix
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Remove Version Prefix
-        run: |
-          version=$(echo "${{ github.ref_name }}" | sed 's/tamagotchi\/v//')
-          echo "Version: $version"
-          echo "VERSION=$version" >> $GITHUB_ENV
-
   build-tamagotchi:
     name: Build Tamagotchi
     needs: remove-version-prefix
@@ -35,7 +22,7 @@ jobs:
             artifact: dmg
           - os: ubuntu-latest
             platform: linux
-            arch: x64
+            arch: x86_64
             artifact: AppImage
           - os: ubuntu-24.04-arm
             platform: linux
@@ -47,6 +34,12 @@ jobs:
             artifact: exe
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Remove Version Prefix
+        run: |
+          version=$(echo "${{ github.ref_name }}" | sed 's/tamagotchi\/v//')
+          echo "Version: $version"
+          echo "VERSION=$version" >> $GITHUB_ENV
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -96,6 +89,12 @@ jobs:
     runs-on: ubuntu-24.04
     needs: build-tamagotchi
     steps:
+      - name: Remove Version Prefix
+        run: |
+          version=$(echo "${{ github.ref_name }}" | sed 's/tamagotchi\/v//')
+          echo "Version: $version"
+          echo "VERSION=$version" >> $GITHUB_ENV
+
       - name: Checkout
         uses: actions/checkout@v4
 
