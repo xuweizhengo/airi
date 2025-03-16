@@ -1,6 +1,7 @@
 import type { Page } from 'playwright'
 import type { TimelineOptions, Tweet } from '../types/twitter'
 
+import { TWITTER_HOME_URL } from '../../constants'
 import { TweetParser } from '../parsers/tweet-parser'
 import { logger } from '../utils/logger'
 import { SELECTORS } from '../utils/selectors'
@@ -26,7 +27,7 @@ export class TwitterTimelineService {
       logger.timeline.withFields({ options }).log('Fetching timeline')
 
       // Navigate to home page
-      await this.page.goto('https://x.com/home')
+      await this.page.goto(TWITTER_HOME_URL)
 
       // Wait for timeline to load
       await this.page.waitForSelector(SELECTORS.TIMELINE.TWEET, { timeout: 10000 })

@@ -4,6 +4,7 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import process from 'node:process'
 
+import { TWITTER_BASE_URL, TWITTER_LOGIN_URL } from '../../constants'
 import { logger } from '../utils/logger'
 import { SELECTORS } from '../utils/selectors'
 
@@ -331,7 +332,7 @@ export class TwitterAuthService {
 
     try {
       // Navigate to a Twitter page
-      await this.page.goto('https://x.com')
+      await this.page.goto(TWITTER_BASE_URL)
 
       // Convert cookies object to array format required by setCookies
       const cookieArray = Object.entries(cookies).map(([name, value]) => ({
@@ -347,7 +348,7 @@ export class TwitterAuthService {
       logger.auth.log(`Set ${cookieArray.length} cookies via browser API`)
 
       // Refresh page to apply cookies
-      await this.page.goto('https://x.com/home')
+      await this.page.goto(`${TWITTER_BASE_URL}/home`)
 
       // Verify if login was successful - try multiple times with longer timeout
       logger.auth.log('Cookies set, verifying login status...')
@@ -368,7 +369,7 @@ export class TwitterAuthService {
           else if (attempt < verificationAttempts) {
             // If not successful but not last attempt, refresh page and wait
             logger.auth.log('Refreshing page and trying again...')
-            await this.page.goto('https://x.com/home')
+            await this.page.goto(`${TWITTER_BASE_URL}/home`)
             await new Promise(resolve => setTimeout(resolve, 3000))
           }
         }
@@ -437,7 +438,7 @@ export class TwitterAuthService {
 
     try {
       // Navigate to login page
-      await this.page.goto('https://x.com/login')
+      await this.page.goto(TWITTER_LOGIN_URL)
 
       // Wait for login form to appear and enter credentials
       try {
@@ -503,7 +504,7 @@ export class TwitterAuthService {
             logger.auth.log('Attempting to navigate to home page and verify login status')
 
             // URL changed - try navigating to home to verify
-            await this.page.goto('https://x.com/home')
+            await this.page.goto(`${TWITTER_BASE_URL}/home`)
 
             // Check if login was successful
             const isLoggedIn = await this.verifyLogin()
@@ -621,7 +622,7 @@ export class TwitterAuthService {
       }
 
       // Navigate to home to verify login
-      await this.page.goto('https://x.com/home')
+      await this.page.goto(`${TWITTER_BASE_URL}/home`)
 
       // Verify if login was successful
       const loginSuccess = await this.verifyLogin()

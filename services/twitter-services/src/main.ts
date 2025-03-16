@@ -6,6 +6,7 @@ import type { Config } from './config/types'
 import process from 'node:process'
 import { chromium } from 'playwright'
 
+import { TWITTER_LOGIN_URL } from '../constants'
 import { useConfigManager } from './config'
 import { TwitterAuthService } from './core/auth-service'
 import { TwitterTimelineService } from './core/timeline-service'
@@ -30,7 +31,7 @@ async function initBrowser(config: Config): Promise<{ browser: Browser, context:
   const page = await context.newPage()
 
   // Navigate to Twitter login page by default
-  await page.goto('https://x.com/login')
+  await page.goto(TWITTER_LOGIN_URL)
 
   logger.main.log('Browser initialized')
   return { browser, context, page }
@@ -53,12 +54,12 @@ async function initTwitterService(page: Page, context: BrowserContext, _config: 
     else {
       // Instead of automatic login, navigate to login page
       logger.main.log('No valid session found, navigating to login page for manual login')
-      await page.goto('https://x.com/login')
+      await page.goto(TWITTER_LOGIN_URL)
     }
   }
   catch (error) {
     logger.main.withError(error as Error).warn('Error checking session, navigating to login page')
-    await page.goto('https://x.com/login')
+    await page.goto(TWITTER_LOGIN_URL)
   }
 
   // Start session monitoring to automatically save session when user logs in

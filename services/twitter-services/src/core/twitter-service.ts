@@ -3,6 +3,7 @@ import type { PostOptions, SearchOptions, TimelineOptions, Tweet, TweetDetail, U
 import type { TwitterAuthService } from './auth-service'
 import type { TwitterTimelineService } from './timeline-service'
 
+import { TWITTER_BASE_URL } from '../../constants'
 import { logger } from '../utils/logger'
 
 export class TwitterService {
@@ -87,7 +88,7 @@ export class TwitterService {
 
     try {
       // Navigate to user profile page
-      await this.page.goto(`https://twitter.com/${username}`)
+      await this.page.goto(`${TWITTER_BASE_URL}/${username}`)
 
       // Wait for profile elements to load
       await this.page.waitForSelector('[data-testid="UserName"]')
