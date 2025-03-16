@@ -28,6 +28,7 @@ export class MCPAdapter {
   private activeTransports: SSEServerTransport[] = []
   private extraResourceInfo: string[] = []
   private ctx: Context
+  private operationsProgress: Map<string, { progress: number, status: string }> = new Map()
 
   private twitterServices: TwitterServices
 
@@ -317,10 +318,20 @@ export class MCPAdapter {
       },
       async ({ count, includeReplies, includeRetweets }) => {
         try {
+          // Generate operation ID
+          const operationId = `timeline-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`
+
+          // Initial progress
+          this.reportProgress(operationId, 0, 'Starting timeline refresh')
+
           const tweets = await this.twitterServices.timeline.getTimeline({
             count,
             includeReplies,
             includeRetweets,
+            // Pass progress callback
+            onProgress: (progress: number, status: string) => {
+              this.reportProgress(operationId, progress, status)
+            },
           })
 
           return {
@@ -329,6 +340,10 @@ export class MCPAdapter {
               text: `Successfully refreshed timeline, retrieved ${tweets.length} tweets`,
             }],
             resources: tweets.map((tweet: Tweet) => `twitter://tweet/${tweet.id}`),
+            // Return operation ID for client to track progress
+            metadata: {
+              operationId,
+            },
           }
         }
         catch (error) {
@@ -498,8 +513,30 @@ export class MCPAdapter {
         endpoints: {
           sse: '/sse',
           messages: '/messages',
+          progress: '/progress/:operationId',
         },
       }
+    }))
+
+    // Progress endpoint - get operation progress
+    router.get('/progress/:operationId', defineEventHandler((event) => {
+      // Get operation ID from URL
+      const operationId = event.context.params?.operationId
+
+      if (!operationId) {
+        event.node.res.statusCode = 400
+        return { error: 'Missing operation ID' }
+      }
+
+      // Get progress for operation
+      const progress = this.getOperationProgress(operationId)
+
+      if (!progress) {
+        event.node.res.statusCode = 404
+        return { error: 'Operation not found' }
+      }
+
+      return progress
     }))
 
     // Use router
@@ -577,6 +614,32 @@ export class MCPAdapter {
         resolve()
       }
     })
+  }
+
+  /**
+   * Report progress for a long-running operation
+   * @param operationId Unique ID for the operation
+   * @param progress Progress value (0-100)
+   * @param status Status message
+   */
+  private reportProgress(operationId: string, progress: number, status: string): void {
+    // Update progress in map
+    this.operationsProgress.set(operationId, { progress, status })
+
+    // Log progress
+    logger.mcp.debug(`Operation ${operationId}: ${progress}% - ${status}`)
+
+    // Could notify client of progress via SSE if needed
+    // This would require extending the MCP protocol or using a custom channel
+  }
+
+  /**
+   * Get current progress for an operation
+   * @param operationId Operation ID
+   * @returns Progress information or undefined if not found
+   */
+  private getOperationProgress(operationId: string): { progress: number, status: string } | undefined {
+    return this.operationsProgress.get(operationId)
   }
 }
 
