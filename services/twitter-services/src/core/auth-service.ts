@@ -207,7 +207,12 @@ export class TwitterAuthService {
    */
   async checkLoginStatus(): Promise<boolean> {
     try {
-      await this.page.goto('https://x.com/home')
+      // Only navigate to home if not already on login page
+      const currentUrl = await this.getCurrentUrl()
+      if (!currentUrl.includes('/i/flow/login')) {
+        await this.page.goto('https://x.com/home')
+      }
+
       const isLoggedIn = await this.verifyLogin()
 
       // If already logged in, update state and automatically save session
