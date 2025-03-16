@@ -6,7 +6,7 @@
   "author": "RainbowBird <rbxin2003@outlook.com>",
   "license": "MIT",
   "scripts": {
-    "dev": "tsx --watch src/main.ts",
+    "dev": "tsx src/main.ts",
     "mcp:ui": "pnpx @modelcontextprotocol/inspector",
     "preinstall": "playwright install chromium"
   },
