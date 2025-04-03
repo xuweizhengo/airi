@@ -18,35 +18,40 @@ if (!target) {
   process.exit(1)
 }
 
+const srcPrefix = path.join(dirname, '..', 'src-tauri', 'target', target, 'release', 'bundle')
+const bundlePrefix = path.join(dirname, '..', 'bundle')
+
+fs.mkdirSync(bundlePrefix)
+
 switch (target) {
   case 'x86_64-pc-windows-msvc':
     fs.renameSync(
-      path.join(dirname, 'src-tauri', 'target', target, 'release', 'bundle', 'nsis', `airi-windows-amd64-${version}-setup.exe`),
-      path.join(dirname, 'bundle', `airi-windows-amd64-${version}-setup.exe`),
+      path.join(srcPrefix, 'nsis', `airi_${version}_x64-setup.exe`),
+      path.join(bundlePrefix, `airi_${version}_windows_amd64-setup.exe`),
     )
     break
   case 'x86_64-unknown-linux-gnu':
     fs.renameSync(
-      path.join(dirname, 'src-tauri', 'target', target, 'release', 'bundle', 'appimage', `airi-linux-x64-${version}.AppImage`),
-      path.join(dirname, 'bundle', `airi-linux-amd64-${version}.AppImage`),
+      path.join(srcPrefix, 'appimage', `airi_${version}_amd64.AppImage`),
+      path.join(bundlePrefix, `airi_${version}_linux_amd64.AppImage`),
     )
     break
   case 'aarch64-unknown-linux-gnu':
     fs.renameSync(
-      path.join(dirname, 'src-tauri', 'target', target, 'release', 'bundle', 'appimage', `airi-linux-aarch64-${version}.AppImage`),
-      path.join(dirname, 'bundle', `airi-linux-arm64-${version}.AppImage`),
+      path.join(srcPrefix, 'appimage', `airi_${version}_aarch64.AppImage`),
+      path.join(bundlePrefix, `airi_${version}_linux_arm64.AppImage`),
     )
     break
   case 'aarch64-apple-darwin':
     fs.renameSync(
-      path.join(dirname, 'src-tauri', 'target', target, 'release', 'bundle', 'dmg', `airi-macos-aarch64-${version}.dmg`),
-      path.join(dirname, 'bundle', `airi-macos-arm64-${version}.dmg`),
+      path.join(srcPrefix, 'dmg', `airi_${version}_aarch64.dmg`),
+      path.join(bundlePrefix, `airi_${version}_macos_arm64.dmg`),
     )
     break
   case 'x86_64-apple-darwin':
     fs.renameSync(
-      path.join(dirname, 'src-tauri', 'target', target, 'release', 'bundle', 'dmg', `airi-macos-x64-${version}.dmg`),
-      path.join(dirname, 'bundle', `airi-macos-amd64-${version}.dmg`),
+      path.join(srcPrefix, 'dmg', `airi_${version}_x64.dmg`),
+      path.join(bundlePrefix, `airi_${version}_macos_amd64.dmg`),
     )
     break
   default:
