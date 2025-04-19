@@ -1,12 +1,12 @@
 /* eslint-disable no-restricted-globals */
 import type { FeatureExtractionPipeline, FeatureExtractionPipelineOptions } from '@huggingface/transformers'
 import type { PipelineOptionsFrom } from '@proj-airi/utils-transformers/types'
-import type { WorkerMessageEvent } from '../types'
+import type { WorkerMessageEvent } from '../types/embed'
 
 import { pipeline } from '@huggingface/transformers'
 import { defu } from 'defu'
 
-import { MessageStatus } from '../types'
+import { MessageStatus } from '../types/embed'
 import { supportsWebGPU } from '../utils'
 
 let embed: FeatureExtractionPipeline

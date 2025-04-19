@@ -1,7 +1,7 @@
 import type { CreateProviderOptions, EmbedProviderWithExtraOptions } from '@xsai-ext/shared-providers'
 import type { EmbedResponse } from '@xsai/embed'
 import type { CommonRequestOptions } from '@xsai/shared'
-import type { LoadOptionProgressCallback, LoadOptions, WorkerMessageEvent } from './types'
+import type { LoadOptionProgressCallback, LoadOptions, WorkerMessageEvent } from './types/embed'
 
 import { merge } from '@xsai-ext/shared-providers'
 import defu from 'defu'

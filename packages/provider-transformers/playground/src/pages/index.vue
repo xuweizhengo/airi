@@ -3,10 +3,10 @@ import type { InitiateProgressInfo, ProgressStatusInfo } from '@proj-airi/utils-
 
 import { embed } from '@xsai/embed'
 import { serialize } from 'superjson'
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 
-import { createTransformers } from '../../../src'
-import embedWorkerURL from '../../../src/worker?worker&url'
+import { createTransformers } from '../../../src/embed'
+import embedWorkerURL from '../../../src/worker/embed?worker&url'
 import Progress from '../components/Progress.vue'
 
 const modelId = ref('Xenova/all-MiniLM-L6-v2')
