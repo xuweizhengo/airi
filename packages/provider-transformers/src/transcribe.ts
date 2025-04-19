@@ -4,8 +4,7 @@ import type { CommonRequestOptions } from '@xsai/shared'
 import type { LoadOptionProgressCallback, LoadOptions, WorkerMessageEvent } from './types/transcribe'
 
 import { merge } from '@xsai-ext/shared-providers'
-
-import { encodeBase64 } from './utils/base64'
+import defu from 'defu'
 
 export type Loadable<P, T = string, T2 = undefined> = P & {
   loadTranscribe: (model: (string & {}) | T, options?: T2) => Promise<void>
@@ -15,9 +14,17 @@ export type Loadable<P, T = string, T2 = undefined> = P & {
 function createTranscribeProvider<T extends string, T2 extends Omit<CommonRequestOptions, 'baseURL' | 'model'> & LoadOptions>(createOptions: CreateProviderOptions): Loadable<TranscriptionProviderWithExtraOptions<T, T2>, T, T2> {
   let worker: Worker
   let isReady = false
+  let _options: T2
 
   function loadModel(model: (string & {}) | T, options?: T2) {
+    _options = options
+
     return new Promise<void>((resolve, reject) => {
+      if (isReady) {
+        resolve()
+        return
+      }
+
       let onProgress: LoadOptionProgressCallback | undefined
       if (options != null && 'onProgress' in options && options.onProgress != null) {
         onProgress = options?.onProgress
@@ -76,14 +83,12 @@ function createTranscribeProvider<T extends string, T2 extends Omit<CommonReques
             })
 
             let file: Blob
-            let fileName: string | undefined
             let formData: FormData
 
             try {
               // Extract the FormData from the request
               formData = init.body as FormData
               file = formData.get('file') as Blob
-              fileName = formData.get('fileName') as string | undefined
 
               if (!file) {
                 reject(new Error('No file provided'))
@@ -98,8 +103,6 @@ function createTranscribeProvider<T extends string, T2 extends Omit<CommonReques
             let errored = false
             let resultDone = false
 
-            debugger
-
             worker.addEventListener('message', (event: MessageEvent<WorkerMessageEvent>) => {
               switch (event.data.type) {
                 case 'error':
@@ -107,8 +110,6 @@ function createTranscribeProvider<T extends string, T2 extends Omit<CommonReques
                   reject(event.data.data.error)
                   break
                 case 'transcribeResult':
-                  console.log('event', event)
-
                   resultDone = true
 
                   // eslint-disable-next-line no-case-declarations
@@ -120,7 +121,6 @@ function createTranscribeProvider<T extends string, T2 extends Omit<CommonReques
 
                   break
                 default:
-                  console.log('event', event)
                   break
               }
             })
@@ -137,10 +137,7 @@ function createTranscribeProvider<T extends string, T2 extends Omit<CommonReques
                   type: 'transcribe',
                   data: {
                     audio: base64,
-                    options: {
-                      ...options,
-                      fileName,
-                    },
+                    options: defu(options, _options),
                   },
                 } satisfies WorkerMessageEvent)
               }).catch(err => reject(err))

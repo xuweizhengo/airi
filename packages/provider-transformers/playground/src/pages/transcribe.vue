@@ -3,13 +3,14 @@ import type { InitiateProgressInfo, ProgressStatusInfo } from '@proj-airi/utils-
 
 import { generateTranscription } from '@xsai/generate-transcription'
 import { serialize } from 'superjson'
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 
 import { createTransformers } from '../../../src/transcribe'
-import transcribeWorkerURL from '../../../src/worker/asr?worker&url'
+import transcribeWorkerURL from '../../../src/worker/transcribe?worker&url'
 import Progress from '../components/Progress.vue'
 
 const modelId = ref('onnx-community/whisper-large-v3-turbo')
+
 const input = ref<File | null>(null)
 const results = ref<any>()
 
@@ -27,6 +28,11 @@ const transformersProvider = createTransformers({ transcribeWorkerURL })
 
 async function load() {
   await transformersProvider.loadTranscribe(modelId.value, {
+    dtype: {
+      encoder_model: 'fp16',
+      decoder_model_merged: 'q4',
+    },
+    device: 'webgpu',
     onProgress: (progress) => {
       switch (progress.status) {
         case 'initiate':
@@ -58,16 +64,20 @@ async function load() {
 }
 
 async function execute() {
-  debugger
   if (!input.value)
     return
 
-  const result = await generateTranscription({
-    ...transformersProvider.transcription(modelId.value),
-    file: input.value,
-  })
+  try {
+    const result = await generateTranscription({
+      ...transformersProvider.transcription(modelId.value),
+      file: input.value,
+    })
 
-  results.value = result
+    results.value = result
+  }
+  catch (err) {
+    console.error(err)
+  }
 }
 
 async function handleLoad() {
@@ -171,7 +181,7 @@ function formatTime(seconds: number): string {
       </h2>
 
       <!-- Recording functionality -->
-      <div flex flex-col gap-2 border="1 rounded neutral-200 dark:neutral-700" p-4>
+      <div flex flex-col gap-2 rounded-lg p-4 shadow-md>
         <h3 text-lg>
           Recording
         </h3>

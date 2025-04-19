@@ -17,6 +17,11 @@ function createEmbedProvider<T extends string, T2 extends Omit<CommonRequestOpti
 
   function loadModel(model: (string & {}) | T, options?: T2) {
     return new Promise<void>((resolve, reject) => {
+      if (isReady) {
+        resolve()
+        return
+      }
+
       let onProgress: LoadOptionProgressCallback | undefined
       if (options != null && 'onProgress' in options && options.onProgress != null) {
         onProgress = options?.onProgress
