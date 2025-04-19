@@ -36,7 +36,7 @@ export interface WorkerMessageEvents {
     progress: ProgressInfo
   }
   transcribe: {
-    audio: ArrayBuffer
+    audio: string
     options?: any
   }
   transcribeResult: {

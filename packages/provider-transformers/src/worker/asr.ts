@@ -16,6 +16,8 @@ import {
   WhisperForConditionalGeneration,
 } from '@huggingface/transformers'
 
+import { MessageStatus } from '../types/transcribe'
+
 const MAX_NEW_TOKENS = 64
 
 /**
@@ -97,6 +99,7 @@ async function generate({ audio, language }: { audio: string, language: string }
       tps = numTokens / (performance.now() - startTime) * 1000
     }
 
+    console.log('output', output)
     globalThis.postMessage({
       status: 'update',
       output,
@@ -113,7 +116,11 @@ async function generate({ audio, language }: { audio: string, language: string }
     callback_function,
   })
 
+  console.log('processor', processor)
+
   const inputs = await processor(audioData)
+
+  console.log('inputs', inputs)
 
   const outputs = await model.generate({
     ...inputs,
@@ -125,10 +132,12 @@ async function generate({ audio, language }: { audio: string, language: string }
   const outputText = tokenizer.batch_decode(outputs as Tensor, { skip_special_tokens: true })
 
   // Send the output back to the main thread
+  console.log('outputText', outputText)
+
   globalThis.postMessage({
-    status: 'complete',
-    output: outputText,
-  })
+    type: 'transcribeResult',
+    data: { output: { text: outputText.join('') } },
+  } satisfies WorkerMessageEvent)
   processing = false
 }
 
@@ -158,18 +167,19 @@ async function load() {
     max_new_tokens: 1,
   } as Record<string, unknown>)
 
-  globalThis.postMessage({ status: 'ready' })
+  globalThis.postMessage({ type: 'status', data: { status: MessageStatus.Ready } } satisfies WorkerMessageEvent)
 }
 // Listen for messages from the main thread
 globalThis.addEventListener('message', async (e) => {
   const { type, data } = e.data
+  console.log('message', e)
 
   switch (type) {
     case 'load':
       load()
       break
 
-    case 'generate':
+    case 'transcribe':
       generate(data)
       break
   }

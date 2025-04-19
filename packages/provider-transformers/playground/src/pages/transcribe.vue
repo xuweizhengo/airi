@@ -1,4 +1,4 @@
-@<script setup lang="ts">
+<script setup lang="ts">
 import type { InitiateProgressInfo, ProgressStatusInfo } from '@proj-airi/utils-transformers/types'
 
 import { generateTranscription } from '@xsai/generate-transcription'
@@ -16,11 +16,14 @@ const results = ref<any>()
 const loadingItems = ref<(InitiateProgressInfo | ProgressStatusInfo)[]>([])
 const loadingItemsSet = new Set<string>()
 
-const transformersProvider = createTransformers({ transcribeWorkerURL })
+const isRecording = ref<boolean>(false)
+const audioChunks = ref<Blob[]>([])
+const mediaRecorder = ref<MediaRecorder | null>(null)
+const recordingTime = ref<number>(0)
+const recordingTimer = ref<number | null>(null)
+const audioURL = ref<string | null>(null)
 
-onMounted(async () => {
-  await load()
-})
+const transformersProvider = createTransformers({ transcribeWorkerURL })
 
 async function load() {
   await transformersProvider.loadTranscribe(modelId.value, {
@@ -55,7 +58,9 @@ async function load() {
 }
 
 async function execute() {
-  if (!input.value) return
+  debugger
+  if (!input.value)
+    return
 
   const result = await generateTranscription({
     ...transformersProvider.transcription(modelId.value),
@@ -75,6 +80,64 @@ function handleFileChange(event: Event) {
   if (target.files && target.files.length > 0) {
     input.value = target.files[0]
   }
+}
+
+async function startRecording() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+    mediaRecorder.value = new MediaRecorder(stream)
+    audioChunks.value = []
+    recordingTime.value = 0
+
+    // Recording time timer
+    recordingTimer.value = window.setInterval(() => {
+      recordingTime.value += 1
+    }, 1000)
+
+    mediaRecorder.value.ondataavailable = (event) => {
+      audioChunks.value.push(event.data)
+    }
+
+    mediaRecorder.value.onstop = () => {
+      if (recordingTimer.value) {
+        clearInterval(recordingTimer.value)
+        recordingTimer.value = null
+      }
+
+      const audioBlob = new Blob(audioChunks.value, { type: 'audio/wav' })
+      if (audioURL.value)
+        URL.revokeObjectURL(audioURL.value)
+      audioURL.value = URL.createObjectURL(audioBlob)
+
+      // Convert recorded audio to File object
+      const fileName = `recording_${new Date().toISOString()}.wav`
+      const file = new File([audioBlob], fileName, { type: 'audio/wav' })
+      input.value = file
+    }
+
+    mediaRecorder.value.start(100) // Collect data every 100ms
+    isRecording.value = true
+  }
+  catch (error) {
+    console.error('Failed to get microphone permission:', error)
+  }
+}
+
+function stopRecording() {
+  if (mediaRecorder.value && isRecording.value) {
+    mediaRecorder.value.stop()
+
+    // Stop all tracks
+    mediaRecorder.value.stream.getTracks().forEach(track => track.stop())
+
+    isRecording.value = false
+  }
+}
+
+function formatTime(seconds: number): string {
+  const minutes = Math.floor(seconds / 60)
+  const remainingSeconds = seconds % 60
+  return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`
 }
 </script>
 
@@ -106,8 +169,35 @@ function handleFileChange(event: Event) {
       <h2 text-xl>
         Inference
       </h2>
-      <div>
-        <input type="file" accept="audio/*" @change="handleFileChange">
+
+      <!-- Recording functionality -->
+      <div flex flex-col gap-2 border="1 rounded neutral-200 dark:neutral-700" p-4>
+        <h3 text-lg>
+          Recording
+        </h3>
+        <div flex flex-row items-center gap-4>
+          <button
+            rounded-lg
+            :bg="isRecording ? 'red-500 dark:red-700' : 'blue-100 dark:blue-900'"
+            px-4 py-2
+            @click="isRecording ? stopRecording() : startRecording()"
+          >
+            {{ isRecording ? 'Stop' : 'Start' }}
+          </button>
+
+          <div v-if="isRecording" flex flex-row items-center gap-2>
+            <div class="h-3 w-3 animate-pulse rounded-full bg-red-500" />
+            <span>Recording: {{ formatTime(recordingTime) }}</span>
+          </div>
+
+          <div v-if="audioURL && !isRecording" flex flex-row items-center gap-2>
+            <audio controls :src="audioURL" />
+          </div>
+        </div>
+
+        <div>
+          <input type="file" accept="audio/*" @change="handleFileChange">
+        </div>
       </div>
       <div flex flex-row gap-2>
         <button rounded-lg bg="blue-100 dark:blue-900" px-4 py-2 @click="execute">

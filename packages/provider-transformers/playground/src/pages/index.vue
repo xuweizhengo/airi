@@ -18,10 +18,6 @@ const loadingItemsSet = new Set<string>()
 
 const transformersProvider = createTransformers({ embedWorkerURL })
 
-onMounted(async () => {
-  await load()
-})
-
 async function load() {
   await transformersProvider.loadEmbed(modelId.value, {
     onProgress: (progress) => {

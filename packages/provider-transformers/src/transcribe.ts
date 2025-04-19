@@ -5,6 +5,8 @@ import type { LoadOptionProgressCallback, LoadOptions, WorkerMessageEvent } from
 
 import { merge } from '@xsai-ext/shared-providers'
 
+import { encodeBase64 } from './utils/base64'
+
 export type Loadable<P, T = string, T2 = undefined> = P & {
   loadTranscribe: (model: (string & {}) | T, options?: T2) => Promise<void>
   terminateTranscribe: () => void
@@ -96,15 +98,17 @@ function createTranscribeProvider<T extends string, T2 extends Omit<CommonReques
             let errored = false
             let resultDone = false
 
-            worker.addEventListener('message', (event: MessageEvent<WorkerMessageEvent>) => {
-              console.log('event', event)
+            debugger
 
+            worker.addEventListener('message', (event: MessageEvent<WorkerMessageEvent>) => {
               switch (event.data.type) {
                 case 'error':
                   errored = true
                   reject(event.data.data.error)
                   break
                 case 'transcribeResult':
+                  console.log('event', event)
+
                   resultDone = true
 
                   // eslint-disable-next-line no-case-declarations
@@ -115,16 +119,24 @@ function createTranscribeProvider<T extends string, T2 extends Omit<CommonReques
                   resolve(new Response(encoder.encode(JSON.stringify(result))))
 
                   break
+                default:
+                  console.log('event', event)
+                  break
               }
             })
 
             if (!errored && !resultDone) {
               // Convert blob to arrayBuffer for processing
               file.arrayBuffer().then((audioData) => {
+                const base64 = btoa(
+                  new Uint8Array(audioData)
+                    .reduce((data, byte) => data + String.fromCharCode(byte), ''),
+                )
+
                 worker.postMessage({
                   type: 'transcribe',
                   data: {
-                    audio: audioData,
+                    audio: base64,
                     options: {
                       ...options,
                       fileName,
