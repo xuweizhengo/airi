@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { PageHeader } from '@proj-airi/stage-ui/components'
 import { useProvidersStore } from '@proj-airi/stage-ui/stores'
+import { PageHeader } from '@proj-airi/ui'
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'

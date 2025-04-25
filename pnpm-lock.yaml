@@ -522,6 +522,9 @@ importers:
       '@proj-airi/stage-ui':
         specifier: workspace:^
         version: link:../../packages/stage-ui
+      '@proj-airi/ui':
+        specifier: workspace:^
+        version: link:../../packages/ui
       '@proj-airi/ui-transitions':
         specifier: workspace:^
         version: link:../../packages/ui-transitions
@@ -945,6 +948,9 @@ importers:
       '@proj-airi/server-sdk':
         specifier: workspace:^
         version: link:../server-sdk
+      '@proj-airi/ui':
+        specifier: workspace:^
+        version: link:../ui
       '@vueuse/core':
         specifier: ^13.1.0
         version: 13.1.0(vue@3.5.13(typescript@5.8.3))

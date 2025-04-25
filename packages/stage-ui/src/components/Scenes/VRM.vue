@@ -1,14 +1,10 @@
 <script setup lang="ts">
+import { VRMModel } from '@proj-airi/stage-ui'
+import { Collapsable, DataGuiRange, Screen, TransitionVertical } from '@proj-airi/ui'
 import { OrbitControls } from '@tresjs/cientos'
 import { TresCanvas } from '@tresjs/core'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-
-import Collapsable from '../Collapsable.vue'
-import DataGuiRange from '../DataGui/Range.vue'
-import Screen from '../Screen.vue'
-import TransitionVertical from '../TransitionVertical.vue'
-import VRMModel from '../VRM/Model.vue'
 
 const props = defineProps<{
   model: string

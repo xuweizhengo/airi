@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { ccv3 } from '@proj-airi/ccc'
 
-import { InputFile } from '@proj-airi/stage-ui/components'
 import { useAiriCardStore } from '@proj-airi/stage-ui/stores'
+import { InputFile } from '@proj-airi/ui'
 import { storeToRefs } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -210,7 +210,7 @@ function getModuleShortName(id: string, module: 'consciousness' | 'voice') {
           </template>
           <template v-else>
             <div flex flex-col items-center>
-              <div i-solar:upload-minimalistic-bold class="text-primary-500 dark:text-primary-400 mb-2 text-5xl" />
+              <div i-solar:upload-minimalistic-bold class="dark:text-primary-400 text-primary-500 mb-2 text-5xl" />
               <p font-medium text="primary-600 dark:primary-300">
                 {{ t('settings.pages.card.drop_here') }}
               </p>

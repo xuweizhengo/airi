@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { IconStatusItem } from '@proj-airi/stage-ui/components'
+import { IconStatusItem } from '@proj-airi/ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 

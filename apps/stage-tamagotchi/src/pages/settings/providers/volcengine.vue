@@ -7,7 +7,7 @@ import {
   FieldRange,
   SpeechPlayground,
   SpeechProviderSettings,
-} from '@proj-airi/stage-ui/components'
+} from '@proj-airi/stage-ui'
 import { useProvidersStore, useSpeechStore } from '@proj-airi/stage-ui/stores'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, ref, watch } from 'vue'

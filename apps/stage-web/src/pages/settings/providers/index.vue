@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { IconStatusItem } from '@proj-airi/stage-ui/components'
 import { useProvidersStore } from '@proj-airi/stage-ui/stores'
+import { IconStatusItem } from '@proj-airi/ui'
 import { storeToRefs } from 'pinia'
 
 import { useIconAnimation } from '../../../composables/useIconAnimation'

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { IconStatusItem } from '@proj-airi/stage-ui/components'
+import { IconStatusItem } from '@proj-airi/stage-ui'
 import { useProvidersStore } from '@proj-airi/stage-ui/stores'
 import { storeToRefs } from 'pinia'
 

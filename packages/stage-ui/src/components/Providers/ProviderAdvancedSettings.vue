@@ -1,7 +1,6 @@
 <script setup lang="ts">
+import { Collapsable } from '@proj-airi/ui'
 import { ref } from 'vue'
-
-import Collapsable from '../Collapsable.vue'
 
 const props = defineProps<{
   title?: string

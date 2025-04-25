@@ -2,13 +2,12 @@
 import type { RemovableRef } from '@vueuse/core'
 
 import {
-  FieldKeyValues,
   ProviderAdvancedSettings,
   ProviderBaseUrlInput,
   ProviderBasicSettings,
   ProviderSettingsContainer,
   ProviderSettingsLayout,
-} from '@proj-airi/stage-ui/components'
+} from '@proj-airi/stage-ui'
 import { useProvidersStore } from '@proj-airi/stage-ui/stores'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, reactive, watch } from 'vue'

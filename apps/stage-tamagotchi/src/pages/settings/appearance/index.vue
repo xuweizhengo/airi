@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Section } from '@proj-airi/stage-ui/components'
 import { useSettings } from '@proj-airi/stage-ui/stores'
+import { Section } from '@proj-airi/ui'
 import { useDark } from '@vueuse/core'
 import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'

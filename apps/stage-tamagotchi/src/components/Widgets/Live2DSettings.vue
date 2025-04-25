@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Collapsable } from '@proj-airi/stage-ui/components'
 import { Emotion, EmotionNeutralMotionName } from '@proj-airi/stage-ui/constants'
 import { useSettings } from '@proj-airi/stage-ui/stores'
+import { Collapsable } from '@proj-airi/ui'
 import { useFileDialog, useObjectUrl } from '@vueuse/core'
 import JSZip from 'jszip'
 import localforage from 'localforage'
