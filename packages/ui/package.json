@@ -1,0 +1,49 @@
+{
+  "name": "@proj-airi/ui",
+  "type": "module",
+  "private": true,
+  "description": "UI components for Airi",
+  "author": {
+    "name": "Neko Ayaka",
+    "email": "neko@ayaka.moe",
+    "url": "https://github.com/nekomeowww"
+  },
+  "license": "MIT",
+  "exports": {
+    "*": {
+      "types": "./dist/components/*/index.d.ts",
+      "import": "./dist/components/*/index.mjs"
+    }
+  },
+  "module": "./dist/components/index.mjs",
+  "types": "./dist/components/index.d.ts",
+  "files": [
+    "dist",
+    "package.json"
+  ],
+  "scripts": {
+    "dev": "pnpm run stub",
+    "stub": "unbuild --stub",
+    "build": "unbuild",
+    "typecheck": "vue-tsc --noEmit",
+    "story:dev": "histoire dev",
+    "story:build": "histoire build",
+    "story:build-base": "histoire build --base /ui",
+    "story:preview": "histoire preview"
+  },
+  "dependencies": {
+    "@formkit/auto-animate": "^0.8.2",
+    "@vueuse/core": "^13.1.0",
+    "@vueuse/motion": "^3.0.3",
+    "radix-vue": "^1.9.17",
+    "reka-ui": "^2.2.0"
+  },
+  "devDependencies": {
+    "@histoire/plugin-vue": "1.0.0-alpha.2",
+    "@unocss/reset": "^66.1.0-beta.12",
+    "@vitejs/plugin-vue": "^5.2.3",
+    "histoire": "1.0.0-alpha.2",
+    "unocss": "^66.1.0-beta.12",
+    "vite": "^6.3.2"
+  }
+}

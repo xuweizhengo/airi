@@ -45,7 +45,7 @@ import CursorFloating from './CursorFloating.vue'
         <CursorFloating>
           <div class="cursor-pointer rounded-lg bg-white p-4 dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-neutral-800">
             <div class="flex items-center gap-2">
-              <div class="i-solar:check-circle-bold-duotone text-primary-500" />
+              <div class="text-primary-500 i-solar:check-circle-bold-duotone" />
               <span>Click me!</span>
             </div>
           </div>
