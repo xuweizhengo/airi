@@ -1,0 +1,329 @@
+use std::{
+  sync::{
+    atomic::{AtomicBool, Ordering},
+    Arc,
+  },
+  time::Instant,
+};
+
+use anyhow::Result;
+use cpal::{traits::*, Device, InputCallbackInfo, SampleRate, Stream, StreamConfig};
+use rubato::{FastFixedIn, PolynomialDegree, Resampler};
+use tauri::{AppHandle, Emitter, Manager};
+use tokio::sync::Mutex;
+
+use crate::candle::{router, AppState};
+
+// Global monitoring state
+static MONITORING_ENABLED: AtomicBool = AtomicBool::new(false);
+
+pub struct AudioManager {
+  _stream:      cpal::Stream,
+  audio_rx:     crossbeam_channel::Receiver<Vec<f32>>,
+  resampler:    Option<FastFixedIn<f32>>,
+  buffered_pcm: Vec<f32>,
+}
+
+impl AudioManager {
+  pub fn new(device_name: Option<String>, target_sample_rate: u32) -> Result<Self> {
+    let host = cpal::default_host();
+    let device = match device_name {
+      None => host.default_input_device(),
+      Some(name) => host.input_devices()?.find(|d| d.name().map(|n| n == name).unwrap_or(false)),
+    }
+    .ok_or_else(|| anyhow::anyhow!("No input device found"))?;
+
+    println!("Using audio input device: {}", device.name()?);
+
+    let config = device.default_input_config()?;
+    let channel_count = config.channels() as usize;
+    let device_sample_rate = config.sample_rate().0;
+
+    println!("Device sample rate: {device_sample_rate}Hz, Target: {target_sample_rate}Hz");
+
+    let (tx, rx) = crossbeam_channel::unbounded();
+
+    let stream = device.build_input_stream(
+      &config.into(),
+      move |data: &[f32], _: &InputCallbackInfo| {
+        // Extract mono audio (first channel only)
+        let mono_data = data.iter().step_by(channel_count).copied().collect::<Vec<f32>>();
+
+        if !mono_data.is_empty() {
+          let _ = tx.send(mono_data);
+        }
+      },
+      |err| eprintln!("Audio stream error: {err}"),
+      None,
+    )?;
+
+    stream.play()?;
+
+    let resampler = if device_sample_rate == target_sample_rate {
+      None
+    } else {
+      let resample_ratio = f64::from(target_sample_rate) / f64::from(device_sample_rate);
+
+      Some(FastFixedIn::new(
+        resample_ratio,
+        10.0, // max_resample_ratio_relative
+        PolynomialDegree::Septic,
+        1024, // chunk_size
+        1,    // channels
+      )?)
+    };
+
+    Ok(Self {
+      _stream: stream,
+      audio_rx: rx,
+      resampler,
+      buffered_pcm: Vec::new(),
+    })
+  }
+
+  #[allow(clippy::future_not_send, clippy::unused_async)]
+  pub async fn receive_audio(&mut self) -> Result<Vec<f32>> {
+    let chunk = self.audio_rx.recv()?;
+
+    if let Some(ref mut resampler) = self.resampler {
+      // Need to resample
+      self.buffered_pcm.extend_from_slice(&chunk);
+
+      let mut resampled_audio = Vec::new();
+
+      // Process in chunks of 1024 samples
+      let full_chunks = self.buffered_pcm.len() / 1024;
+      let remainder = self.buffered_pcm.len() % 1024;
+
+      for chunk_idx in 0..full_chunks {
+        let chunk_slice = &self.buffered_pcm[chunk_idx * 1024..(chunk_idx + 1) * 1024];
+        let resampled = resampler.process(&[chunk_slice], None)?;
+        resampled_audio.extend_from_slice(&resampled[0]);
+      }
+
+      // Handle remainder
+      if remainder == 0 {
+        self.buffered_pcm.clear();
+      } else {
+        self.buffered_pcm.copy_within(full_chunks * 1024.., 0);
+        self.buffered_pcm.truncate(remainder);
+      }
+
+      Ok(resampled_audio)
+    } else {
+      // No resampling needed, return the chunk directly
+      Ok(chunk)
+    }
+  }
+}
+
+pub struct AudioBuffer {
+  buffer:                       Vec<f32>,
+  max_duration_samples:         usize,
+  min_speech_duration_samples:  usize,
+  min_silence_duration_samples: usize,
+  is_recording:                 bool,
+  silence_start:                Option<Instant>,
+  speech_start:                 Option<Instant>,
+  samples_since_speech_start:   usize,
+  samples_since_silence_start:  usize,
+  sample_rate:                  usize,
+}
+
+impl AudioBuffer {
+  pub const fn new(max_duration_ms: u64, min_speech_duration_ms: u64, min_silence_duration_ms: u64, sample_rate: u32) -> Self {
+    let sample_rate = sample_rate as usize;
+    Self {
+      buffer: Vec::new(),
+      max_duration_samples: (max_duration_ms * sample_rate as u64 / 1000) as usize,
+      min_speech_duration_samples: (min_speech_duration_ms * sample_rate as u64 / 1000) as usize,
+      min_silence_duration_samples: (min_silence_duration_ms * sample_rate as u64 / 1000) as usize,
+      is_recording: false,
+      silence_start: None,
+      speech_start: None,
+      samples_since_speech_start: 0,
+      samples_since_silence_start: 0,
+      sample_rate,
+    }
+  }
+
+  pub fn add_chunk(&mut self, chunk: &[f32], is_speech: bool) -> Option<Vec<f32>> {
+    if is_speech {
+      #[allow(clippy::if_not_else)]
+      if !self.is_recording {
+        if self.speech_start.is_none() {
+          self.speech_start = Some(Instant::now());
+          self.samples_since_speech_start = 0;
+        }
+
+        self.samples_since_speech_start += chunk.len();
+
+        if self.samples_since_speech_start >= self.min_speech_duration_samples {
+          self.is_recording = true;
+          self.silence_start = None;
+          self.samples_since_silence_start = 0;
+          println!("🚀 Started recording");
+        }
+      } else {
+        // Reset silence tracking
+        self.silence_start = None;
+        self.samples_since_silence_start = 0;
+      }
+    } else {
+      // Reset speech tracking
+      self.speech_start = None;
+      self.samples_since_speech_start = 0;
+
+      if self.is_recording {
+        if self.silence_start.is_none() {
+          self.silence_start = Some(Instant::now());
+          self.samples_since_silence_start = 0;
+        }
+
+        self.samples_since_silence_start += chunk.len();
+
+        if self.samples_since_silence_start >= self.min_silence_duration_samples {
+          // End of speech detected
+          if !self.buffer.is_empty() {
+            let result = self.buffer.clone();
+            self.reset();
+            #[allow(clippy::cast_precision_loss)]
+            let duration_secs = result.len() as f32 / self.sample_rate as f32;
+            println!("🔇 Stopped recording, {duration_secs:.2}s");
+            return Some(result);
+          }
+
+          self.reset();
+        }
+      }
+    }
+
+    if self.is_recording {
+      self.buffer.extend_from_slice(chunk);
+
+      // Check if buffer exceeds max duration
+      if self.buffer.len() >= self.max_duration_samples {
+        let result = self.buffer.clone();
+        self.reset();
+        println!("⏰ Max duration reached, {} samples", result.len());
+        return Some(result);
+      }
+    }
+
+    None
+  }
+
+  fn reset(&mut self) {
+    self.buffer.clear();
+    self.is_recording = false;
+    self.silence_start = None;
+    self.speech_start = None;
+    self.samples_since_speech_start = 0;
+    self.samples_since_silence_start = 0;
+  }
+}
+
+// Start realtime audio monitoring
+pub async fn start_monitoring(state: &AppState, device_name: Option<String>, model_name: String, app_handle: AppHandle) -> Result<()> {
+  // Check if already monitoring
+  if MONITORING_ENABLED.load(Ordering::Relaxed) {
+    return Err(anyhow::anyhow!("Audio monitoring is already running"));
+  }
+
+  // Set monitoring flag
+  MONITORING_ENABLED.store(true, Ordering::Relaxed);
+
+  // Create audio manager
+  let target_sample_rate = 16000; // Whisper expects 16kHz
+  let mut audio_manager = AudioManager::new(device_name, target_sample_rate)?;
+  let mut audio_buffer = AudioBuffer::new(10000, 100, 500, target_sample_rate);
+
+  // Clone state and model name for the async task
+  let state_clone = state.clone();
+  let model_name_clone = model_name.clone();
+
+  // Start monitoring task
+  tokio::spawn(async move {
+    println!("🎤 Audio monitoring started with model: {}", model_name_clone);
+
+    // Emit monitoring started event
+    if let Err(e) = app_handle.emit(
+      "audio-monitoring-started",
+      &serde_json::json!({
+        "model": model_name_clone,
+        "sample_rate": target_sample_rate
+      }),
+    ) {
+      println!("❌ Failed to emit monitoring started event: {e}");
+    }
+
+    while MONITORING_ENABLED.load(Ordering::Relaxed) {
+      match audio_manager.receive_audio().await {
+        Ok(chunk) => {
+          // Process chunk in 512-sample frames
+          for frame in chunk.chunks(512) {
+            if !MONITORING_ENABLED.load(Ordering::Relaxed) {
+              break;
+            }
+
+            if let Err(e) = router::process_realtime_chunk(&state_clone, frame, &mut audio_buffer, &model_name_clone, &app_handle).await {
+              println!("❌ Error processing realtime chunk: {e}");
+            }
+          }
+        },
+        Err(e) => {
+          println!("❌ Error receiving audio: {e}");
+          // Emit error event
+          if let Err(emit_err) = app_handle.emit(
+            "audio-monitoring-error",
+            &serde_json::json!({
+              "error": e.to_string()
+            }),
+          ) {
+            println!("❌ Failed to emit monitoring error event: {emit_err}");
+          }
+          break;
+        },
+      }
+    }
+
+    println!("🛑 Audio monitoring stopped");
+
+    // Emit monitoring stopped event
+    if let Err(e) = app_handle.emit("audio-monitoring-stopped", &serde_json::json!({})) {
+      println!("❌ Failed to emit monitoring stopped event: {e}");
+    }
+  });
+
+  Ok(())
+}
+
+// Stop realtime audio monitoring
+pub async fn stop_monitoring(app_handle: AppHandle) -> Result<()> {
+  if !MONITORING_ENABLED.load(Ordering::Relaxed) {
+    return Err(anyhow::anyhow!("Audio monitoring is not running"));
+  }
+
+  // Set monitoring flag to false
+  MONITORING_ENABLED.store(false, Ordering::Relaxed);
+
+  // Emit stopping event
+  if let Err(e) = app_handle.emit("audio-monitoring-stopping", &serde_json::json!({})) {
+    println!("❌ Failed to emit monitoring stopping event: {e}");
+  }
+
+  Ok(())
+}
+
+// Check if monitoring is active
+pub fn is_monitoring() -> bool {
+  MONITORING_ENABLED.load(Ordering::Relaxed)
+}
+
+// Get list of available audio input devices
+pub async fn get_audio_devices() -> Result<Vec<String>> {
+  let host = cpal::default_host();
+  let devices: Result<Vec<String>, _> = host.input_devices()?.map(|device| device.name()).collect();
+
+  devices.map_err(|e| anyhow::anyhow!("Failed to get device names: {e}"))
+}

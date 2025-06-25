@@ -16,6 +16,9 @@ mod app_click_through;
 mod app_windows;
 mod commands;
 
+// Add candle module for audio processing
+mod candle;
+
 #[cfg(target_os = "macos")]
 use app_click_through::native_macos::{get_mouse_location, get_window_frame};
 #[cfg(target_os = "windows")]
@@ -98,6 +101,21 @@ pub fn run() {
     .plugin(tauri_plugin_global_shortcut::Builder::new().build())
     .manage(WindowClickThroughState::default())
     .setup(|app| {
+      // Initialize audio processing state
+      tauri::async_runtime::spawn(async move {
+        match candle::initialize_state().await {
+          Ok(state) => {
+            println!("✅ Audio processing state initialized successfully");
+            // Store the state in the app handle for later use
+            // Note: We can't directly manage the state here due to async constraints
+            // The state will be initialized on first use in commands
+          }
+          Err(e) => {
+            println!("❌ Failed to initialize audio processing state: {e}");
+          }
+        }
+      });
+
       let mut builder = WebviewWindowBuilder::new(app, "main", WebviewUrl::default());
 
       builder = builder.title("AIRI").decorations(false).inner_size(450.0, 600.0).shadow(false).transparent(true).always_on_top(true);
@@ -135,6 +153,13 @@ pub fn run() {
         .menu(&menu)
         .on_menu_event(|app, event| match event.id().as_ref() {
           "quit" => {
+            // Stop audio monitoring before quitting
+            tauri::async_runtime::block_on(async {
+              if candle::audio_manager::is_monitoring() {
+                let _ = candle::stop_audio_monitoring(app.clone()).await;
+              }
+            });
+            
             tauri_plugin_mcp::destroy(app);
             let _ = app.emit("mcp_plugin_destroyed", ());
             app.cleanup_before_exit();
@@ -183,11 +208,25 @@ pub fn run() {
       stop_monitor,
       start_click_through,
       stop_click_through,
+      // Audio processing commands
+      candle::transcribe_audio_file,
+      candle::start_audio_monitoring,
+      candle::stop_audio_monitoring,
+      candle::get_available_models,
+      candle::get_audio_devices,
+      candle::health_check,
     ])
     .build(tauri::generate_context!())
     .expect("error while building tauri application")
-    .run(|_, event| {
+    .run(|app_handle, event| {
       if let RunEvent::ExitRequested { .. } = event {
+        // Stop audio monitoring before exiting
+        tauri::async_runtime::block_on(async {
+          if candle::audio_manager::is_monitoring() {
+            let _ = candle::stop_audio_monitoring(app_handle.clone()).await;
+          }
+        });
+        
         println!("Exiting app");
         println!("Exited app");
       }
