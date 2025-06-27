@@ -1,18 +1,18 @@
 use std::{
   sync::{
-    atomic::{AtomicBool, Ordering},
     Arc,
+    atomic::{AtomicBool, Ordering},
   },
   time::Instant,
 };
 
 use anyhow::Result;
-use cpal::{traits::*, Device, InputCallbackInfo, SampleRate, Stream, StreamConfig};
+use cpal::{Device, InputCallbackInfo, SampleRate, Stream, StreamConfig, traits::*};
 use rubato::{FastFixedIn, PolynomialDegree, Resampler};
 use tauri::{AppHandle, Emitter, Manager};
 use tokio::sync::Mutex;
 
-use crate::candle::{router, AppState};
+use crate::candle::{AppState, router};
 
 // Global monitoring state
 static MONITORING_ENABLED: AtomicBool = AtomicBool::new(false);
@@ -233,11 +233,6 @@ pub async fn start_monitoring(state: &AppState, device_name: Option<String>, mod
   // Set monitoring flag
   MONITORING_ENABLED.store(true, Ordering::Relaxed);
 
-  // Create audio manager
-  let target_sample_rate = 16000; // Whisper expects 16kHz
-  let mut audio_manager = AudioManager::new(device_name, target_sample_rate)?;
-  let mut audio_buffer = AudioBuffer::new(10000, 100, 500, target_sample_rate);
-
   // Clone state and model name for the async task
   let state_clone = state.clone();
   let model_name_clone = model_name.clone();
@@ -251,43 +246,11 @@ pub async fn start_monitoring(state: &AppState, device_name: Option<String>, mod
       "audio-monitoring-started",
       &serde_json::json!({
         "model": model_name_clone,
-        "sample_rate": target_sample_rate
+        "sample_rate": 16000
       }),
     ) {
       println!("❌ Failed to emit monitoring started event: {e}");
     }
-
-    while MONITORING_ENABLED.load(Ordering::Relaxed) {
-      match audio_manager.receive_audio().await {
-        Ok(chunk) => {
-          // Process chunk in 512-sample frames
-          for frame in chunk.chunks(512) {
-            if !MONITORING_ENABLED.load(Ordering::Relaxed) {
-              break;
-            }
-
-            if let Err(e) = router::process_realtime_chunk(&state_clone, frame, &mut audio_buffer, &model_name_clone, &app_handle).await {
-              println!("❌ Error processing realtime chunk: {e}");
-            }
-          }
-        },
-        Err(e) => {
-          println!("❌ Error receiving audio: {e}");
-          // Emit error event
-          if let Err(emit_err) = app_handle.emit(
-            "audio-monitoring-error",
-            &serde_json::json!({
-              "error": e.to_string()
-            }),
-          ) {
-            println!("❌ Failed to emit monitoring error event: {emit_err}");
-          }
-          break;
-        },
-      }
-    }
-
-    println!("🛑 Audio monitoring stopped");
 
     // Emit monitoring stopped event
     if let Err(e) = app_handle.emit("audio-monitoring-stopped", &serde_json::json!({})) {
