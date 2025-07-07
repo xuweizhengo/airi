@@ -1,3 +1,4 @@
+import { presetChromatic } from '@proj-airi/unocss-preset-chromatic'
 import {
   defineConfig,
   presetAttributify,
@@ -31,6 +32,13 @@ export default defineConfig({
     }),
     presetIcons({
       scale: 1.2,
+    }),
+    presetChromatic({
+      baseHue: 220.25, // default hue offset
+      colors: {
+        primary: 0,
+        secondary: 180, // to create a complementary color scheme
+      },
     }),
   ],
   transformers: [
