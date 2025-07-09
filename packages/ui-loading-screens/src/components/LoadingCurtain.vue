@@ -44,14 +44,14 @@ const { width, height } = useWindowSize()
 
 const maskImage = computed(() => {
   const svg = `<svg width="${width.value}" height="${height.value}" xmlns="http://www.w3.org/2000/svg">
-    <path d="${generateSineWavePath(width.value, height.value, 10, step1Width.value.width, 'down')}"/>
+    <path d="${generateSineWavePath(width.value, height.value, 10, step1Width.value.width / 40, 'down')}"/>
   </svg>`
   return `url(data:image/svg+xml;base64,${btoa(svg)})`
 })
 
 onMounted(async () => {
   await animate(step1Width.value, {
-    width: 100,
+    width: width.value,
     duration: 1000,
     ease: 'cubicBezier(.2,1,.49,1)',
   }).then()
@@ -66,7 +66,9 @@ onMounted(async () => {
     :style="{
       maskImage,
       WebkitMaskImage: maskImage,
-      width: `${step1Width.width}vw`,
+      maskPosition: `${step1Width.width / -80}px 0`,
+      maskSize: `${width * 2}px ${height}px`,
+      width: `${step1Width.width}px `,
     }"
   >
     <template v-for="i in 10" :key="i">
