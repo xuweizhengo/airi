@@ -19,10 +19,6 @@ export default defineConfig({
   vite: {
     base: '/ui/',
   },
-  setupFile: {
-    browser: 'stories/setup.ts',
-    server: 'stories/setup.server.ts',
-  },
   viteNodeTransformMode: {
     web: [
       /\.web\.vue$/,
