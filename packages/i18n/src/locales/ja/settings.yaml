@@ -1,14 +1,14 @@
 animations:
   stage-transitions:
-    title: Disable Stage Transitions
+    title: 画面切り替えのアニメーションを無効にする
   use-page-specific-transitions:
     description: >-
       Some pages will have their own transitions, this will override the stage transitions
     title: Use Page Specific Transitions
 dialogs:
   onboarding:
-    title: Welcome to AIRI!
-    description: Let's set up your first AI provider to get started.
+    title: AIRI へようこそ！
+    description: 最初の AI プロバイダーを設定しましょう。
     selectProvider: Choose an AI Provider
     configureProvider: Configure {provider}
     apiKey: API Key
