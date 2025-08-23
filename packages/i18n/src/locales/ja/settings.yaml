@@ -1,6 +1,6 @@
 animations:
   stage-transitions:
-    title: 画面切り替えのアニメーションを無効にする
+    title: 画面切り替えアニメーションを無効化
   use-page-specific-transitions:
     description: >-
       Some pages will have their own transitions, this will override the stage transitions
@@ -9,8 +9,8 @@ dialogs:
   onboarding:
     title: AIRI へようこそ！
     description: 最初の AI プロバイダーを設定しましょう。
-    selectProvider: Choose an AI Provider
-    configureProvider: Configure {provider}
+    selectProvider: AI プロバイダーの選択
+    configureProvider: '{provider} の設定'
     apiKey: API Key
     apiKeyHelp: Get your API key from {provider} and paste it here
     baseUrl: Base URL
@@ -24,11 +24,11 @@ dialogs:
     saveAndContinue: Save and Continue
     next: Next
     start: Let's do it!
-    select-model: Choose model
+    select-model: モデルの選択
 language:
-  title: Language
+  title: 言語
   description: >
-    Change the language of the AIRI interface. This will not affect the language of the character's responses.
+    インターフェースの言語を変更します。キャラクターの応答言語には影響しません。
   options:
     chinese: 简体中文
     zh-CN: 简体中文
@@ -49,20 +49,20 @@ live2d:
     title: Edit motion map
   map-motions:
     play: Play Motion
-    title: Map Motions
-  title: Live2D Settings
+    title: モーションの割り当て
+  title: Live2D の設定
   scale-and-position:
-    title: Scale And Position
-    scale: Scale
+    title: スケールと位置
+    scale: スケール
     x: X
     'y': 'Y'
   switch-to-vrm:
-    title: Switch to 3D Avatar?
-    change-to-vrm: Click here to switch to the 3D avatar setting (VRM)
+    title: 3D モデルに切り替えますか？
+    change-to-vrm: 3D モデル（VRM）の設定に切り替え
   theme-color-from-model:
-    title: Extract colors from model
+    title: モデルから色の取得
     button-extract:
-      title: Extract
+      title: 色を取得
   focus:
     title: Disable model mouse tracking
     button-disable:
