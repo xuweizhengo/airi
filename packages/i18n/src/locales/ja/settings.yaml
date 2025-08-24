@@ -20,10 +20,10 @@ dialogs:
     validationSuccess: First configuration validated successful.
     validationFailed: Configuration validation failed
     validationError: 'Validation error: {error}'
-    skipForNow: Skip for now
-    saveAndContinue: Save and Continue
-    next: Next
-    start: Let's do it!
+    skipForNow: 後で
+    saveAndContinue: 保存して続行
+    next: 次へ
+    start: やってみましょう！
     select-model: モデルの選択
 language:
   title: 言語
