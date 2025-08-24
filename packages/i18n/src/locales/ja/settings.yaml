@@ -64,11 +64,11 @@ live2d:
     button-extract:
       title: 色を取得
   focus:
-    title: Disable model mouse tracking
+    title: モデルのマウストラッキングの無効化
     button-disable:
-      title: Disable
-microphone: Microphone
-models: Model
+      title: 無効化
+microphone: マイク
+models: モデル
 pages:
   card:
     activate: Activate
@@ -411,6 +411,9 @@ pages:
       openai:
         description: openai.com
         title: OpenAI
+      openai-compatible:
+        description: OpenAI Compatible
+        title: OpenAI Compatible
       openrouter:
         description: openrouter.ai
         title: OpenRouter
