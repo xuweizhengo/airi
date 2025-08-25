@@ -16,8 +16,6 @@ dialogs:
     baseUrl: Base URL
     baseUrlHelp: API endpoint URL (use default if unsure)
     accountId: Account ID
-    validating: Validating configuration...
-    validationSuccess: First configuration validated successful.
     validationFailed: Configuration validation failed
     validationError: 'Validation error: {error}'
     skipForNow: 後で
@@ -25,10 +23,12 @@ dialogs:
     next: 次へ
     start: やってみましょう！
     select-model: モデルの選択
-language:
-  title: 言語
+    no-models: No available models
+    no-models-help: Please return to the previous step and check your API key, or check the network connection.
+  language:
+  title: Language
   description: >
-    インターフェースの言語を変更します。キャラクターの応答言語には影響しません。
+    Change the language of the AIRI interface. This will not affect the language of the character's responses.
   options:
     chinese: 简体中文
     zh-CN: 简体中文
