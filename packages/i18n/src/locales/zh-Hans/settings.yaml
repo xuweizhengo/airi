@@ -16,8 +16,6 @@ dialogs:
     baseUrl: 基础 URL
     baseUrlHelp: API 端点 URL（如果不确定请使用默认值）
     accountId: 账户 ID
-    validating: 正在验证配置...
-    validationSuccess: 配置初步验证通过。
     validationFailed: 配置验证失败
     validationError: '验证错误：{error}'
     skipForNow: 暂时跳过
@@ -25,13 +23,15 @@ dialogs:
     next: 下一步
     start: 开始吧！
     select-model: 选择模型
-language:
-  title: 语言
+    no-models: 找不到可用模型
+    no-models-help: 请返回上一步并检查您的 API Key，或检查网络连接。
+  language:
+  title: Language
   description: >
-    切换显示界面的语言
+    Change the language of the AIRI interface. This will not affect the language of the character's responses.
   options:
     chinese: 简体中文
-    zh-CN: 中文
+    zh-CN: 简体中文
     zh-Hans: 简体中文
     english: English
     en: English
