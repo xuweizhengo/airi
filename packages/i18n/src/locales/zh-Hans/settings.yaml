@@ -25,18 +25,10 @@ dialogs:
     select-model: 选择模型
     no-models: 找不到可用模型
     no-models-help: 请返回上一步并检查您的 API Key，或检查网络连接。
-  language:
-  title: Language
+language:
+  title: 语言
   description: >
-    Change the language of the AIRI interface. This will not affect the language of the character's responses.
-  options:
-    chinese: 简体中文
-    zh-CN: 简体中文
-    zh-Hans: 简体中文
-    english: English
-    en: English
-    en-US: English (US)
-    es: Spanish
+    切换显示界面的语言
 live2d:
   change-model:
     from-file: 从文件加载
@@ -596,3 +588,6 @@ vrm:
   theme-color-from-model:
     button-extract:
       title: 提取
+  skybox:
+    skybox-intensity: 天空盒光照强度
+    skybox-specular-mix: 漫反射/镜面反射混合系数
