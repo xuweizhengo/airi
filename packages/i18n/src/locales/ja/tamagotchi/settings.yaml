@@ -4,8 +4,8 @@ allow-visible-on-all-workspaces:
 pages:
   modules:
     mcp-server:
-      description: Connect and manage MCP server and tools
-      title: MCP Server
+      description: MCP サーバーとツールの接続と管理
+      title: MCP サーバー
   themes:
     sections:
       section:
