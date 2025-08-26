@@ -1,10 +1,10 @@
 operations:
-  load-models: Load Models
+  load-models: モデルを読み込む
   load-models-status:
-    loading: Loading
-    ready: Ready
+    loading: 読み込み中
+    ready: 準備完了
 docs:
   theme:
     navbar:
       appearance:
-        title: Appearance
+        title: 表示設定
