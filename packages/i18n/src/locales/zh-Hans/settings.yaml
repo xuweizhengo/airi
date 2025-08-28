@@ -219,6 +219,7 @@ pages:
             no_models_description: 该服务来源的模型列表没有返回任何的数据
             no_voices: 没有任何可用的声线
             no_voices_description: 该服务来源的声线列表没有返回任何的数据
+            no_voices_hint: You can enter a custom voice name below.
             pause: Pause
             play_sample: Play
             search_models_placeholder: 搜索模型...
@@ -394,6 +395,9 @@ pages:
       moonshot:
         description: Moonshot.ai
         title: 月之暗面
+      modelscope:
+        description: modelscope.cn
+        title: 魔搭社区 ModelScope
       novita:
         description: novita.ai
         title: Novita
