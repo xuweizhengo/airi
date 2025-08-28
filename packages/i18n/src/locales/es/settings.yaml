@@ -322,6 +322,9 @@ pages:
               placeholder: Ingresa la Clave API de Cloudflare
         title: Cloudflare Workers AI
       common:
+        status:
+          validating: Validating
+          valid: Configuration seems to be valid.
         fields:
           field:
             pitch:
