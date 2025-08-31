@@ -1,4 +1,4 @@
-import type { MessageChannel, ModelProvider } from '@proj-airi/core'
+import type { AiriPlugin, MessageChannel, ModelProvider } from '@proj-airi/core'
 
 import { ConfigService, CoreClient } from '@proj-airi/core'
 import { inject, shallowRef } from 'vue'
@@ -11,7 +11,7 @@ interface CreateOpts {
   key?: string // localStorage key
   providers?: Record<string, ModelProvider>
   channel?: MessageChannel
-  plugins?: any[]
+  plugins?: AiriPlugin[]
 }
 
 export function createCore(opts: CreateOpts = {}) {
