@@ -13,7 +13,7 @@
   "types": "dist/index.d.ts",
   "files": ["dist"],
   "scripts": {
-    "build": "tsc -b",
+    "build": "tsdown",
     "clean": "rimraf dist",
     "typecheck": "tsc --noEmit"
   },
