@@ -27,3 +27,17 @@ packages/core/
       index.ts          // Stateless Client
 
 ```
+
+## Purpose
+
+The core package defines the contract layer of the system.
+It provides abstract interfaces and minimal runtime utilities that other packages (such as runtime-core and front-end apps) can rely on.
+
+## Design
+
+ - Contract first:
+  - Exposes TypeScript interfaces like ConfigBackend, CoreClient, etc. These describe what functionality exists without prescribing how it is implemented.
+ - Separation of concerns:
+  - core holds only abstractions and lightweight helpers. Concrete behaviour lives in runtime-core (Vue composables, lifecycle bindings) or higher-level apps.
+
+*Any suggestions or advice for a better refactoring design is welcomed!*
