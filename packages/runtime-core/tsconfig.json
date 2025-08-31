@@ -6,6 +6,10 @@
     "rootDir": "src",
     "module": "ES2022",
     "moduleResolution": "Bundler",
+    "paths": {
+      "@proj-airi/core": ["../core/src/index.ts"],
+      "@proj-airi/core/*": ["../core/src/*"]
+    },
     "strict": true,
     "declaration": true,
     "declarationMap": true,
