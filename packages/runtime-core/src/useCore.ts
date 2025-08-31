@@ -1,11 +1,14 @@
 import type { AiriPlugin, MessageChannel, ModelProvider } from '@proj-airi/core'
+import type { InjectionKey } from 'vue'
 
 import { ConfigService, CoreClient } from '@proj-airi/core'
 import { inject, shallowRef } from 'vue'
 
 import { LocalStorageBackend } from './backends/local-storage'
 
-const KEY = Symbol('@proj-airi/core')
+const KEY: InjectionKey<{
+  init: () => Promise<CoreClient>
+}> = Symbol('@proj-airi/core')
 
 interface CreateOpts {
   key?: string // localStorage key
