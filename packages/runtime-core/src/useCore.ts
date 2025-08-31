@@ -40,7 +40,7 @@ export function createCore(opts: CreateOpts = {}) {
 }
 
 export async function useCore() {
-  const bag = inject<{ init: () => Promise<CoreClient> }>(KEY as any)
+  const bag = inject(KEY)
   if (bag)
     return bag.init()
 
