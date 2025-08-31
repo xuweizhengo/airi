@@ -1,4 +1,5 @@
 import type { ConfigService } from '../config/service'
+import type { AiriPlugin } from '../plugin'
 import type { MessageChannel } from '../primitives/message-channel'
 import type { ModelProvider, ProviderRequest } from '../primitives/model-provider'
 
@@ -7,7 +8,7 @@ import { PluginRegistry } from '../plugin/registry'
 export interface CoreDeps {
   channel?: MessageChannel // Optional, depending on use case
   providers?: Record<string, ModelProvider>
-  plugins?: any[] // AiriPlugin[]
+  plugins?: AiriPlugin[]
   config: ConfigService
 }
 
