@@ -54,6 +54,9 @@ catalogs:
     xsschema:
       specifier: ^0.4.0-beta.2
       version: 0.4.0-beta.2
+    zod:
+      specifier: ^4.1.4
+      version: 4.1.4
   rolldown-vite:
     vite:
       specifier: npm:rolldown-vite@^7.1.5
@@ -707,6 +710,9 @@ importers:
       '@proj-airi/ccc':
         specifier: workspace:^
         version: link:../../packages/ccc
+      '@proj-airi/core':
+        specifier: workspace:*
+        version: link:../../packages/core
       '@proj-airi/drizzle-duckdb-wasm':
         specifier: 'catalog:'
         version: 0.4.28(drizzle-orm@0.44.5(@opentelemetry/api@1.9.0)(@types/pg@8.15.5)(gel@2.0.0)(pg@8.16.3)(postgres@3.4.7))(web-worker@1.5.0)
@@ -719,6 +725,9 @@ importers:
       '@proj-airi/i18n':
         specifier: workspace:^
         version: link:../../packages/i18n
+      '@proj-airi/runtime-core':
+        specifier: workspace:*
+        version: link:../../packages/runtime-core
       '@proj-airi/server-sdk':
         specifier: workspace:^
         version: link:../../packages/server-sdk
@@ -1173,6 +1182,19 @@ importers:
         specifier: ^1.0.6
         version: 1.0.6
 
+  packages/core:
+    dependencies:
+      zod:
+        specifier: ^3.23.0
+        version: 3.25.76
+    devDependencies:
+      rimraf:
+        specifier: ^5.0.0
+        version: 5.0.10
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.2
+
   packages/font-cjkfonts-allseto: {}
 
   packages/font-departure-mono: {}
@@ -1203,6 +1225,22 @@ importers:
       tsx:
         specifier: ^4.20.5
         version: 4.20.5
+
+  packages/runtime-core:
+    dependencies:
+      '@proj-airi/core':
+        specifier: workspace:*
+        version: link:../core
+      vue:
+        specifier: ^3.4.0
+        version: 3.5.20(typescript@5.9.2)
+      zod:
+        specifier: 'catalog:'
+        version: 4.1.4
+    devDependencies:
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.2
 
   packages/server-runtime:
     dependencies:
