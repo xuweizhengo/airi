@@ -20,7 +20,7 @@ export class CoreClient {
     for (const provider of Object.values(this.deps.providers ?? {})) this.registry.registerProvider(provider as ModelProvider)
     // load plugins
     if (this.deps.plugins?.length)
-      await this.registry.load(this.deps.plugins as any)
+      await this.registry.load(this.deps.plugins)
     return this
   }
 
