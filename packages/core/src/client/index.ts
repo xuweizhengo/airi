@@ -35,7 +35,7 @@ export class CoreClient {
     const processed = await this.registry.applyInput(req)
 
     // Support both streaming and unary providers
-    let result: unknown;
+    let result: unknown
     if ('stream' in provider) {
       const chunks: unknown[] = []
       // Streaming to provider
@@ -43,7 +43,7 @@ export class CoreClient {
         processed as ProviderRequest,
         (c) => { chunks.push(c) },
       )
-      result = chunks;
+      result = chunks
     }
     else {
       // Unary request to provider
