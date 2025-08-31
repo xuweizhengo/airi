@@ -24,7 +24,7 @@ export class CoreClient {
     return this
   }
 
-  // User a provder to make a request
+  // Use a provider to make a request
   async request(providerId: string, req: ProviderRequest) {
     // Get provider
     const provider = this.registry.getProvider(providerId)
