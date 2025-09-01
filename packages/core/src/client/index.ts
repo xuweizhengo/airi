@@ -12,54 +12,74 @@ export interface CoreDeps {
   config: ConfigService
 }
 
-export class CoreClient {
-  constructor(private deps: CoreDeps, private registry = new PluginRegistry()) {}
+export interface CoreClient {
+  init: () => Promise<CoreClient>
+  request: (providerId: string, req: ProviderRequest) => Promise<unknown>
+  readonly config: ConfigService
+  readonly channel?: MessageChannel
+}
 
-  async init() {
-    // register Provider
-    for (const provider of Object.values(this.deps.providers ?? {})) this.registry.registerProvider(provider as ModelProvider)
-    // load plugins
-    if (this.deps.plugins?.length)
-      await this.registry.load(this.deps.plugins)
-    return this
+/**
+ * Factory-style CoreClient (composition over class)
+ */
+export function createCoreClient(
+  deps: CoreDeps,
+  registry: PluginRegistry = new PluginRegistry(),
+): CoreClient {
+  // 用单一引用保存依赖，便于测试时替换
+  const state = { deps, registry }
+
+  const coreClient: CoreClient = {
+    async init() {
+      // register Provider(s)
+      const providers = Object.values(state.deps.providers ?? {})
+      for (const provider of providers) {
+        state.registry.registerProvider(provider as ModelProvider)
+      }
+
+      // load plugins
+      if (state.deps.plugins?.length) {
+        await state.registry.load(state.deps.plugins)
+      }
+      return coreClient
+    },
+
+    async request(providerId: string, req: ProviderRequest) {
+      const provider = state.registry.getProvider(providerId)
+      if (!provider)
+        throw new Error(`Provider not found: ${providerId}`)
+
+      // input processing (pre)
+      const processed = await state.registry.applyInput(req)
+
+      // Support both streaming and unary providers
+      let result: unknown
+      if ('stream' in provider) {
+        const chunks: unknown[] = []
+        // Streaming to provider
+        await provider.stream(processed as ProviderRequest, (c) => {
+          chunks.push(c)
+        })
+        result = chunks
+      }
+      else {
+        // Unary request to provider
+        result = await provider.request(processed as ProviderRequest)
+      }
+
+      // output processing (post)
+      const output = await state.registry.applyOutput(result)
+      return output
+    },
+
+    // getters
+    get config() {
+      return state.deps.config
+    },
+    get channel() {
+      return state.deps.channel
+    },
   }
 
-  // Use a provider to make a request
-  async request(providerId: string, req: ProviderRequest) {
-    // Get provider
-    const provider = this.registry.getProvider(providerId)
-    if (!provider)
-      throw new Error(`Provider not found: ${providerId}`)
-
-    // Input precessing - before sending to provider
-    const processed = await this.registry.applyInput(req)
-
-    // Support both streaming and unary providers
-    let result: unknown
-    if ('stream' in provider) {
-      const chunks: unknown[] = []
-      // Streaming to provider
-      await provider.stream(
-        processed as ProviderRequest,
-        (c) => { chunks.push(c) },
-      )
-      result = chunks
-    }
-    else {
-      // Unary request to provider
-      result = await provider.request(processed as ProviderRequest)
-    }
-
-    // Output processing - after receiving from provider
-    const output = await this.registry.applyOutput(result)
-    return output
-  }
-
-  get config() {
-    return this.deps.config
-  }
-
-  get channel() {
-    return this.deps.channel
-  }
+  return coreClient
 }
