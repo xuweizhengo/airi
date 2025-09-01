@@ -193,6 +193,10 @@ pages:
     hearing:
       description: Configurar cómo funciona el reconocimiento de voz
       title: Audición
+      sections:
+        section:
+          provider-selection:
+            description: Select the suitable speech recognition provider
     memory-long-term:
       description: Configuraciones específicas y gestión de memoria a largo plazo
       title: Memoria a Largo Plazo
