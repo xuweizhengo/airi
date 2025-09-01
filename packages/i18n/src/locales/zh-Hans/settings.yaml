@@ -193,6 +193,10 @@ pages:
     hearing:
       description: 语音识别
       title: 听觉
+      sections:
+        section:
+          provider-selection:
+            description: Select the suitable speech recognition provider
     memory-long-term:
       description: 长期记忆
       title: 长期记忆
