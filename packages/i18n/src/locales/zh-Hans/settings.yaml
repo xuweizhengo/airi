@@ -24,7 +24,8 @@ dialogs:
     start: 开始吧！
     select-model: 选择模型
     no-models: 找不到可用模型
-    no-models-help: 请返回上一步并检查您的 API Key，或检查网络连接。
+    no-models-help: >-
+      请返回上一步并检查您的 API Key，或检查网络连接。
 language:
   title: 语言
   description: >
@@ -455,99 +456,104 @@ pages:
   scene:
     description: 配置角色所在环境
     title: 场景
-  themes:
+  system:
     color-scheme:
-      description: 更改舞台的配色方案
-      title: 配色方案
+      description: Change the color scheme of the stage.
+      title: Color Scheme
     developer:
-      description: 为开发者提供的选项
-      title: 开发者
+      description: Some developer options.
+      title: Developers
     general:
-      description: 深色主题、语言等选项
-      title: 通用
-    description: 自定义你的舞台外观！
+      description: Dark theme, languages, etc.
+      title: General
+    description: Customize your stage!
     sections:
       section:
         custom-color:
           fields:
             field:
               primary-color:
-                label: 强调色
+                label: Primary color
                 rgb-on:
-                  title: RGB ON!
-          title: 配色
+                  title: I Want It Dynamic!
+          title: Color Scheme
         developer:
-          title: 开发者
+          title: Developer
+          sections:
+            section:
+              use-magic-keys:
+                title: useMagicKeys
+                description: Test shortcuts
         theme-presets:
           presets:
             - 
             colors:
-                - AIRI 绿
-              description: 默认的绿色主题，由 AIRI 为您带来！
-              title: 默认颜色
+                - AIRI Green
+              description: The default greenish theme color, brought by AIRI to you!
+              title: Default Color
             - 
             colors:
-                - 灰褐色
-                - 米色
-                - 灰白色
-                - 浅灰褐色
-                - 象牙色
-                - 橄榄灰
-                - 沙色
-                - 暖灰色
-              description: 受乔治·莫兰迪绘画启发的柔和、低调的色调
-              title: Morandi 颜色
+                - Taupe
+                - Beige
+                - Ash Grey
+                - Light Taupe
+                - Ivory
+                - Olive Grey
+                - Sand
+                - Warm Grey
+              description: Soft, muted tones inspired by Giorgio Morandi's paintings
+              title: Morandi Colors
             - 
             colors:
-                - 天蓝色
-                - 薄雾色
-                - 沙色
-                - 苔藓绿
-                - 睡莲色
-                - 小麦色
-                - 板岩蓝
-                - 鼠尾草色
-              description: 受克劳德·莫奈作品启发的印象派调色板
-              title: 莫奈颜色
+                - Sky Blue
+                - Mist
+                - Sand
+                - Moss Green
+                - Water Lily
+                - Wheat
+                - Slate Blue
+                - Sage
+              description: Impressionist palette inspired by Claude Monet's works
+              title: Monet Colors
             - 
             colors:
-                - 棕褐色
-                - 暖灰褐色
-                - 赭色
-                - 咖啡色
-                - 青铜色
-                - 金色
-                - 芥末色
-                - 琥珀色
-              description: 传统日本色彩调色板
-              title: 日本颜色
+                - Tan
+                - Warm Taupe
+                - Umber
+                - Coffee
+                - Bronze
+                - Gold
+                - Mustard
+                - Amber
+              description: Traditional Japanese color palette
+              title: Japanese Colors
             - 
             colors:
-                - 北欧蓝
-                - 冰色
-                - 峡湾色
-                - 钢铁色
-                - 冰川色
-                - 板岩色
-                - 云色
-                - 石头色
-              description: 北欧极简主义配色方案
-              title: 北欧颜色
+                - Nordic Blue
+                - Ice
+                - Fjord
+                - Steel
+                - Glacier
+                - Slate
+                - Cloud
+                - Stone
+              description: Scandinavian minimalist color scheme
+              title: Nordic Colors
             - 
             colors:
-                - 霞光红
-                - 枣红
-                - 黄栌
-                - 竹青
-                - 乌梅紫
-                - 缃色
-                - 青冥
-                - 赭石
+                - Rosy Dawn
+                - Chinese Red
+                - Smoky Brown
+                - Bamboo Green
+                - Dark Purple
+                - Golden Yellow
+                - Azure Blue
+                - Ochre
               description: >-
-                中国传统色彩，源自古代纺织品、瓷器和绘画
-              title: 中国传统颜色
-          title: 预设
-    title: 外观
+                Traditional Chinese colors, derived from ancient textiles, porcelain and paintings
+              title: Chinese Traditional Colors
+          title: Color Scheme Presets
+    title: System
 sections:
   section:
     general:
