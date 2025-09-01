@@ -26,7 +26,6 @@ export function createCoreClient(
   deps: CoreDeps,
   registry: PluginRegistry = new PluginRegistry(),
 ): CoreClient {
-  // 用单一引用保存依赖，便于测试时替换
   const state = { deps, registry }
 
   const coreClient: CoreClient = {
