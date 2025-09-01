@@ -6,7 +6,7 @@ pages:
     mcp-server:
       description: MCP サーバーとツールの接続と管理
       title: MCP サーバー
-  themes:
+  system:
     sections:
       section:
         window-shortcuts:
