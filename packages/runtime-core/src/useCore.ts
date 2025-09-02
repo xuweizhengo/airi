@@ -23,7 +23,7 @@ export function createCore(opts: CreateOpts = {}) {
   async function init() {
     if (coreRef.value)
       return coreRef.value
-    const core = await new CoreClient({
+    const core = await createCoreClient({
       config: new ConfigService(new LocalStorageBackend(opts.key ?? 'airi.runtime')),
       providers: opts.providers,
       channel: opts.channel,
