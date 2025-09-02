@@ -33,7 +33,7 @@ export function createCoreClient(
       // register Provider(s)
       const providers = Object.values(state.deps.providers ?? {})
       for (const provider of providers) {
-        state.registry.registerProvider(provider as ModelProvider)
+        state.registry.registerProvider(provider)
       }
 
       // load plugins
