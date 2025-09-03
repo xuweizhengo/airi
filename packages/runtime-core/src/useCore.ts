@@ -1,7 +1,6 @@
-import type { AiriPlugin, MessageChannel, ModelProvider } from '@proj-airi/core'
+import type { AiriPlugin, ConfigService, type CoreClient, createCoreClient, MessageChannel, ModelProvider } from '@proj-airi/core'
 import type { InjectionKey } from 'vue'
 
-import { ConfigService, CoreClient } from '@proj-airi/core'
 import { inject, shallowRef } from 'vue'
 
 import { LocalStorageBackend } from './backends/local-storage'
