@@ -1,4 +1,4 @@
-import Yaml from 'unplugin-yaml/rolldown'
+import Yaml from 'unplugin-yaml/rollup'
 
 import { defineConfig } from 'tsdown'
 
