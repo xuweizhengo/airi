@@ -1,2 +1,2 @@
-export * from './backends/local-storage.js'
-export * from './useCore.js'
+export * from './backends/local-storage'
+export * from './useCore'
