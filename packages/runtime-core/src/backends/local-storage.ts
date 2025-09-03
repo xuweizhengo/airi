@@ -5,7 +5,13 @@ export class LocalStorageBackend implements ConfigBackend {
 
   async get() {
     const r = localStorage.getItem(this.key)
-    return r ? JSON.parse(r) : {}
+    try {
+      return r ? JSON.parse(r) : {}
+    }
+    catch (e) {
+      console.error(`[LocalStorageBackend] Failed to parse config from localStorage with key "${this.key}":`, e)
+      return {}
+    }
   }
 
   async set(v: unknown) {
