@@ -89,6 +89,8 @@ const dropShadowFilter = shallowRef(new DropShadowFilter({
   rotation: 45,
 }))
 
+const modelDefaultXY = ref({ x: 0, y: 0 })
+
 function getCoreModel() {
   return model.value!.internalModel.coreModel as any
 }
@@ -110,6 +112,8 @@ function setScaleAndPosition() {
 
   model.value.x = (props.width / 2) + offset.value.xOffset
   model.value.y = props.height + offset.value.yOffset
+
+  modelDefaultXY.value = { x: model.value.x, y: model.value.y }
 }
 
 const {
@@ -124,6 +128,14 @@ const {
 } = storeToRefs(useSettings())
 
 const localCurrentMotion = ref<{ group: string, index: number }>({ group: 'Idle', index: 0 })
+
+function lissajous(t: number) {
+  // https://www.desmos.com/calculator/es7xinokqt
+  return {
+    x: Math.cos(t - 0.15 * Math.PI),
+    y: -Math.sin(2 * t),
+  }
+}
 
 async function loadModel() {
   await until(modelLoading).not.toBeTruthy()
@@ -211,6 +223,13 @@ async function loadModel() {
     // This is hacky too
     const hookedUpdate = motionManager.update as (model: CubismModel, now: number) => boolean
     motionManager.update = function (model: CubismModel, now: number) {
+      const l = lissajous(now * 2)
+
+      modelInstance.x = modelDefaultXY.value.x + (10 * l.x)
+      modelInstance.y = modelDefaultXY.value.y + (20 * l.y)
+
+      modelInstance.angle = 4 * l.x // This is just a workaround until we can bend
+
       lastUpdateTime.value = now
 
       hookedUpdate?.call(this, model, now)
