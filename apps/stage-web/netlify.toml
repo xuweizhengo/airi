@@ -1,22 +1,10 @@
 [build]
 base = "/"
-command = """
-corepack enable &&
-pnpm -r --filter @proj-airi/stage-web... --filter @proj-airi/docs... --filter @proj-airi/stage-ui... \
-  install --frozen-lockfile --config.ignore-scripts=false &&
-
-pnpm -F @proj-airi/stage-web run build &&
-
-pnpm -F @proj-airi/docs run build:base &&
-mv ./docs/.vitepress/dist ./apps/stage-web/dist/docs &&
-
-pnpm -F @proj-airi/stage-ui run story:build &&
-mv ./packages/stage-ui/.histoire/dist ./apps/stage-web/dist/ui
-"""
+command = "pnpm -F @proj-airi/stage-web run build && pnpm -F @proj-airi/docs run build:base && mv ./docs/.vitepress/dist ./apps/stage-web/dist/docs && pnpm -F @proj-airi/stage-ui run story:build && mv ./packages/stage-ui/.histoire/dist ./apps/stage-web/dist/ui"
 publish = "/apps/stage-web/dist"
 
 [build.environment]
-NODE_VERSION = "22"
+NODE_VERSION = "24"
 NODE_OPTIONS = "--max-old-space-size=4096"
 
 # Plausible.io analytics
