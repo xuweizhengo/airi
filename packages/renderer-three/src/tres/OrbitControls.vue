@@ -32,9 +32,11 @@ function registerBus() {
   unSubList.push(props.bus.commandsBus.on(
     'orbit-controls/model-size',
     (newSize) => {
-      controls.value!.minDistance = newSize.z
-      controls.value!.maxDistance = newSize.z * 20
-      controls.value!.update()
+      if (!controls.value)
+        return
+      controls.value.minDistance = newSize.z
+      controls.value.maxDistance = newSize.z * 20
+      controls.value.update()
     },
     { immediate: true },
   ))
@@ -42,13 +44,15 @@ function registerBus() {
   unSubList.push(props.bus.commandsBus.on(
     'orbit-controls/position',
     (newPosition) => {
-      camera!.value!.position.set(
+      if (!camera.value || !controls.value)
+        return
+      camera.value.position.set(
         newPosition.x,
         newPosition.y,
         newPosition.z,
       )
-      camera!.value!.updateProjectionMatrix()
-      controls.value!.update()
+      camera.value.updateProjectionMatrix()
+      controls.value.update()
     },
     { immediate: true },
   ))
@@ -56,6 +60,8 @@ function registerBus() {
   unSubList.push(props.bus.commandsBus.on(
     'orbit-controls/target',
     (newTarget) => {
+      if (!controls.value)
+        return
       controls.value!.target.set(newTarget.x, newTarget.y, newTarget.z)
       controls.value!.update()
     },
@@ -65,6 +71,8 @@ function registerBus() {
   unSubList.push(props.bus.commandsBus.on(
     'orbit-controls/fov',
     (newFOV) => {
+      if (!camera.value || !controls.value)
+        return
       camera!.value!.fov = newFOV
       camera!.value!.updateProjectionMatrix()
       controls.value!.update()
@@ -75,17 +83,19 @@ function registerBus() {
   unSubList.push(props.bus.commandsBus.on(
     'orbit-controls/distance',
     (newDistance) => {
+      if (!camera.value || !controls.value)
+        return
       const newPosition = new THREE.Vector3()
       const target = controls.value!.target
-      const direction = new THREE.Vector3().subVectors(camera!.value!.position, target).normalize()
+      const direction = new THREE.Vector3().subVectors(camera.value.position, target).normalize()
       newPosition.copy(target).addScaledVector(direction, newDistance)
-      camera!.value!.position.set(
+      camera.value.position.set(
         newPosition.x,
         newPosition.y,
         newPosition.z,
       )
-      camera!.value!.updateProjectionMatrix()
-      controls.value!.update()
+      camera.value.updateProjectionMatrix()
+      controls.value.update()
     },
     { immediate: true },
   ))
@@ -116,7 +126,7 @@ onMounted(async () => {
     return
   }
   // Narrow down the camera's type
-  if (!(cameraTres as any).value?.isPerspectiveCamera) {
+  if (!(cameraTres.value instanceof THREE.PerspectiveCamera)) {
     console.warn('Camera is not perspective camera, type error!')
     return
   }
