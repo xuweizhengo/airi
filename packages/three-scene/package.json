@@ -30,6 +30,7 @@
     "@vueuse/core": "^13.9.0",
     "culori": "^4.0.2",
     "pinia": "^3.0.3",
+    "postprocessing": "^6.37.7",
     "three": "^0.179.1",
     "vue": "^3.5.21"
   },
