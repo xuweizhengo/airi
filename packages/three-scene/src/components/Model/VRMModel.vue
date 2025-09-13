@@ -108,7 +108,7 @@ const props = withDefaults(defineProps<{
 */
 const emit = defineEmits<{
   (e: 'vrmModelLoadingProgress', value: number): void
-  (e: 'vrmModelFirstLoad'): void
+  (e: 'vrmModelLoadStart'): void
   (e: 'vrmModelCameraPosition', value: Vec3): void
   (e: 'vrmModelModelOrigin', value: Vec3): void
   (e: 'vrmModelModelSize', value: Vec3): void
@@ -236,11 +236,9 @@ async function loadModel() {
     }
     // First load or not? if yes then reset the pinia store
     const isFirstLoad = modelSrc.value !== lastModelSrc.value
-    if (isFirstLoad) {
-      emit('vrmModelFirstLoad')
-    }
 
     try {
+      emit('vrmModelLoadStart')
       // Load vrm model
       modelLoaded.value = false
       const _vrmInfo = await loadVrm(modelSrc.value, {

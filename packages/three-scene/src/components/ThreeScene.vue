@@ -130,17 +130,24 @@ function onOrbitControlsReady() {
 }
 
 //  === VRMModel ===
-function onVRMModelFirstLoad() {
-  modelStore.resetModelStore()
+const modelLoaded = ref<boolean>(false)
+function onVRMModelLoadStart() {
+  modelLoaded.value = false
 }
-function onVRMModelCameraPostion(value: Vec3) {
-  cameraPosition.value = value
+function onVRMModelCameraPosition(value: Vec3) {
+  cameraPosition.value.x = value.x
+  cameraPosition.value.y = value.y
+  cameraPosition.value.z = value.z
 }
 function onVRMModelModelOrigin(value: Vec3) {
-  modelOrigin.value = value
+  modelOrigin.value.x = value.x
+  modelOrigin.value.y = value.y
+  modelOrigin.value.z = value.z
 }
 function onVRMModelModelSize(value: Vec3) {
-  modelSize.value = value
+  modelSize.value.x = value.x
+  modelSize.value.y = value.y
+  modelSize.value.z = value.z
 }
 function onVRMModelRotationY(value: number) {
   modelRotationY.value = value
@@ -149,10 +156,13 @@ function onVRMModelEyeHeight(value: number) {
   eyeHeight.value = value
 }
 function onVRMModelLookAtTarget(value: Vec3) {
-  lookAtTarget.value = value
+  lookAtTarget.value.x = value.x
+  lookAtTarget.value.y = value.y
+  lookAtTarget.value.z = value.z
 }
 function onVRMModelLoaded(value: string) {
   lastModelSrc.value = value
+  modelLoaded.value = true
 }
 
 // === sky box ===
@@ -277,6 +287,7 @@ defineExpose({
     >
       <OrbitControls
         ref="controlsRef"
+        :model-loaded="modelLoaded"
         :model-size="modelSize"
         :camera-position="cameraPosition"
         :camera-target="modelOrigin"
@@ -337,8 +348,8 @@ defineExpose({
         :camera="camera"
 
         @vrm-model-loading-progress="(val: number) => emit('loadModelProgress', val)"
-        @vrm-model-first-load="onVRMModelFirstLoad"
-        @vrm-model-camera-position="onVRMModelCameraPostion"
+        @vrm-model-load-start="onVRMModelLoadStart"
+        @vrm-model-camera-position="onVRMModelCameraPosition"
         @vrm-model-model-origin="onVRMModelModelOrigin"
         @vrm-model-model-size="onVRMModelModelSize"
         @vrm-model-model-rotation-y="onVRMModelRotationY"

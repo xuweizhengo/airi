@@ -28,6 +28,7 @@ import { onMounted, onUnmounted, shallowRef, toRefs, watch } from 'vue'
   * - camera distance: camera position - camera target
 */
 const props = defineProps<{
+  modelLoaded: boolean
   modelSize: Vec3
   cameraPosition: Vec3
   cameraTarget: Vec3
@@ -48,6 +49,7 @@ const emit = defineEmits<{
 }>()
 
 const {
+  modelLoaded,
   modelSize,
   cameraPosition,
   cameraTarget,
@@ -117,7 +119,7 @@ function registerInfoFlow() {
     )
     camera.value.updateProjectionMatrix()
     controls.value.update()
-  }, { immediate: true })
+  })
 
   /*
     * Upward info flow
@@ -125,17 +127,19 @@ function registerInfoFlow() {
   */
   // send camera update info
   const onChange = () => {
-    emit(
-      'orbitControlsCameraChanged',
-      {
-        newCameraPosition: {
-          x: camera!.value!.position.x,
-          y: camera!.value!.position.y,
-          z: camera!.value!.position.z,
+    if (modelLoaded.value) {
+      emit(
+        'orbitControlsCameraChanged',
+        {
+          newCameraPosition: {
+            x: camera!.value!.position.x,
+            y: camera!.value!.position.y,
+            z: camera!.value!.position.z,
+          },
+          newCameraDistance: controls.value!.getDistance(),
         },
-        newCameraDistance: controls.value!.getDistance(),
-      },
-    )
+      )
+    }
   }
   controls.value?.addEventListener('change', onChange)
 }
@@ -143,6 +147,8 @@ function registerInfoFlow() {
 onMounted(async () => {
   // wait until camera is not undefined
   await until(() => cameraTres.value && renderer.value?.domElement).toBeTruthy()
+  // Prevent the data value fluctuation, camera setting should take effective after model loading
+  await until(() => props.modelLoaded).toBeTruthy()
   if (!cameraTres.value || !renderer.value?.domElement) {
     console.warn('Camera or Renderer initialisation failure!')
     return
