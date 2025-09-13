@@ -500,10 +500,6 @@ onMounted(async () => {
       emit('vrmModelLookAtTarget', defaultTookAt(eyeHeight.value))
     }
   }, { immediate: true })
-  // update look at target
-  watch(lookAtTarget, (newTarget) => {
-    idleEyeSaccades.instantUpdate(vrm.value, newTarget)
-  }, { deep: true })
 })
 
 onUnmounted(() => componentCleanUp())

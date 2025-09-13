@@ -56,6 +56,7 @@ export type FieldValueOf<D> = D extends SelectField<infer T> ? T
 export const useModelStore = defineStore('modelStore', () => {
   // const defaultRootDir = 'settings/3d-model'
 
+  const scale = useLocalStorage('settings/three-scene/scale', 1)
   const lastModelSrc = useLocalStorage('settings/three-scene/lastModelSrc', '')
 
   const modelSize = useLocalStorage('settings/three-scene/modelSize', { x: 0, y: 0, z: 0 })
@@ -119,6 +120,7 @@ export const useModelStore = defineStore('modelStore', () => {
   const skyBoxIntensity = useLocalStorage('settings/three-scene/skyBoxIntensity', 0.1)
 
   return {
+    scale,
     lastModelSrc,
 
     modelSize,
