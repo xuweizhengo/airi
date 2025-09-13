@@ -3,7 +3,7 @@ import type { Vector3 } from 'three'
 import { useLocalStorage } from '@vueuse/core'
 import { defineStore } from 'pinia'
 
-import defaultSkyBoxSrc from '../components/environment/assets/sky_linekotsi_23_HDRI.hdr?url'
+import defaultSkyBoxSrc from '../components/Environment/assets/sky_linekotsi_23_HDRI.hdr?url'
 
 // TODO: this is for future type injection features
 // TODO: make a separate type.ts
