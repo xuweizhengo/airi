@@ -42,6 +42,8 @@ import {
   onUnmounted,
   ref,
 
+  shallowRef,
+
   toRefs,
   watch,
 
@@ -141,14 +143,14 @@ const {
 
 // Model and scene ref
 const { scene } = useTresContext()
-const vrm = ref<VRMCore>()
-const vrmGroup = ref<Group>()
+const vrm = shallowRef<VRMCore>()
+const vrmGroup = shallowRef<Group>()
 const modelLoaded = ref<boolean>(false)
 // for eye tracking modes
 const { x: mouseX, y: mouseY } = useMouse()
 const raycaster = new Raycaster()
 const mouse = new Vector2()
-const mouseTarget = ref<Vec3>()
+const mouseTarget = shallowRef<Vec3>()
 let stopMouseWatch: WatchStopHandle | undefined
 let stopCameraWatch: WatchStopHandle | undefined
 
@@ -462,12 +464,12 @@ onMounted(async () => {
     if (vrmGroup.value) {
       vrmGroup.value.rotation.y = MathUtils.degToRad(newRotationY)
     }
-  }, { immediate: true, deep: true })
+  }, { immediate: true })
   // update NPR sky box
   watch([envSelect, skyBoxIntensity, nprIrrSH], async () => {
     if (!vrm.value)
       return
-      // force the program to flush
+    // force the program to flush
     nprProgramVersion.value += 1
     const mode = normalizeEnvMode(envSelect.value)
     updateNprShaderSetting(vrm.value?.scene, {
@@ -476,7 +478,7 @@ onMounted(async () => {
       sh: nprIrrSH.value ?? null,
     })
     airiIblProbe?.update(mode, skyBoxIntensity.value, nprIrrSH.value ?? null)
-  }, { immediate: true, deep: false })
+  }, { immediate: true })
   // update eye tracking mode
   watch(trackingMode, (newMode) => {
     stopCameraWatch?.()
@@ -500,6 +502,9 @@ onMounted(async () => {
       emit('vrmModelLookAtTarget', defaultTookAt(eyeHeight.value))
     }
   }, { immediate: true })
+  watch(lookAtTarget, (newTarget) => {
+    idleEyeSaccades.instantUpdate(vrm.value, newTarget)
+  }, { deep: true })
 })
 
 onUnmounted(() => componentCleanUp())

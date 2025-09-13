@@ -185,21 +185,14 @@ const effectProps = {
   blendFunction: BlendFunction.SRC,
 }
 
-// let isUpdatingCamera = true
-// manage the sequence of the camera and controls initialization
-
+// === Directional Light ===
+// TODO: wrap <TresDirectionalLight> to integrate all the below code
 const sceneReady = ref(false)
 const dirLightReady = ref(false)
 
 function onDirLightReady() {
   dirLightReady.value = true
 }
-
-// // If model is ready
-// function handleLoadModelProgress() {
-//   modelReady.value = true
-// }
-
 // Then start to set the camera position and target
 watch(
   [controlsReady, dirLightReady],
@@ -280,7 +273,6 @@ defineExpose({
       :height="height"
       :tone-mapping="ACESFilmicToneMapping"
       :tone-mapping-exposure="1"
-      :preserve-drawing-buffer="true"
       @ready="onTresReady"
     >
       <OrbitControls
