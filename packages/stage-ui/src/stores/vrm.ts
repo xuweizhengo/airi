@@ -1,34 +1,35 @@
-import { useBroadcastChannel, useLocalStorage } from '@vueuse/core'
+import { useLocalStorage } from '@vueuse/core'
 import { defineStore } from 'pinia'
-import { ref, watch } from 'vue'
 
 import defaultSkyBoxSrc from '../components/Scenes/Tres/assets/sky_linekotsi_23_HDRI.hdr?url'
 
-type BroadcastChannelEvents
-  = | BroadcastChannelEventShouldUpdateView
+// type BroadcastChannelEvents
+//   = | BroadcastChannelEventShouldUpdateView
 
-interface BroadcastChannelEventShouldUpdateView {
-  type: 'should-update-view'
-}
+// interface BroadcastChannelEventShouldUpdateView {
+//   type: 'should-update-view'
+// }
 
 export const useVRM = defineStore('vrm', () => {
-  const { post, data } = useBroadcastChannel<BroadcastChannelEvents, BroadcastChannelEvents>({ name: 'airi-stores-vrm' })
-  const shouldUpdateViewHooks = ref<Array<() => void | Promise<void>>>([])
+  // Lilia: I think the hook for updating the model loading should be at least put in the setting.ts store rather than here...
+  // This store is only used to config the model position, camera position/settings and and lighting
+  // const { post, data } = useBroadcastChannel<BroadcastChannelEvents, BroadcastChannelEvents>({ name: 'airi-stores-vrm' })
+  // const shouldUpdateViewHooks = ref<Array<() => void | Promise<void>>>([])
 
-  const onShouldUpdateView = (hook: () => void | Promise<void>) => {
-    shouldUpdateViewHooks.value.push(hook)
-  }
+  // const onShouldUpdateView = (hook: () => void | Promise<void>) => {
+  //   shouldUpdateViewHooks.value.push(hook)
+  // }
 
-  function shouldUpdateView() {
-    post({ type: 'should-update-view' })
-    shouldUpdateViewHooks.value.forEach(hook => hook())
-  }
+  // function shouldUpdateView() {
+  //   // post({ type: 'should-update-view' })
+  //   shouldUpdateViewHooks.value.forEach(hook => hook())
+  // }
 
-  watch(data, (event) => {
-    if (event.type === 'should-update-view') {
-      shouldUpdateViewHooks.value.forEach(hook => hook())
-    }
-  })
+  // watch(data, (event) => {
+  //   if (event.type === 'should-update-view') {
+  //     shouldUpdateViewHooks.value.forEach(hook => hook())
+  //   }
+  // })
 
   const scale = useLocalStorage('settings/vrm/cameraScale', 1)
   const modelSize = useLocalStorage('settings/vrm/modelSize', { x: 0, y: 0, z: 0 })
@@ -59,19 +60,11 @@ export const useVRM = defineStore('vrm', () => {
   // TODO: color are the same
   const directionalLightColor = useLocalStorage('settings/vrm/scenes/scene/directional-light/color', '#fffbf5')
 
-  // TODO: color are the same
   const hemisphereSkyColor = useLocalStorage('settings/vrm/scenes/scene/hemisphere-light/sky-color', '#FFFFFF')
-  // TODO: color are the same
-  // Lilia: The ground color is not pure black
   const hemisphereGroundColor = useLocalStorage('settings/vrm/scenes/scene/hemisphere-light/ground-color', '#222222')
-  // TODO: The same as directional light, this is a temporary solution
-  //       and will be replaced with a more flexible lighting system in the future.
   const hemisphereLightIntensity = useLocalStorage('settings/vrm/scenes/scene/hemisphere-light/intensity', 0.4)
 
-  // TODO: color are the same
   const ambientLightColor = useLocalStorage('settings/vrm/scenes/scene/ambient-light/color', '#FFFFFF')
-  // TODO: The same as directional light, this is a temporary solution
-  //       and will be replaced with a more flexible lighting system in the future.
   const ambientLightIntensity = useLocalStorage('settings/vrm/scenes/scene/ambient-light/intensity', 0.6)
 
   const lookAtTarget = useLocalStorage('settings/vrm/lookAtTarget', { x: 0, y: 0, z: 0 })
@@ -117,7 +110,7 @@ export const useVRM = defineStore('vrm', () => {
     skyBoxSrc,
     skyBoxIntensity,
 
-    shouldUpdateView,
-    onShouldUpdateView,
+    // shouldUpdateView,
+    // onShouldUpdateView,
   }
 })
