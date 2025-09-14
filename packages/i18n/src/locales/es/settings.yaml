@@ -232,6 +232,8 @@ pages:
             search_models_results: Encontrados {count} de {total} modelos
             search_voices_placeholder: Buscar voces...
             search_voices_results: Encontradas {count} de {total} voces
+            unsupported_voice_warning_title: No supported voices
+            unsupported_voice_warning_content: Try a different model or provider. We are working on supporting all the voice for this model as quickly as possible. If you need it urgently, please let us know on GitHub at https://github.com/moeru-ai/airi/issues.
             show_less: Mostrar menos
             show_more: Mostrar más
             title: Proveedor
