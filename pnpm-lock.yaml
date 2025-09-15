@@ -1095,6 +1095,9 @@ importers:
       '@proj-airi/stage-ui':
         specifier: workspace:^
         version: link:../../packages/stage-ui
+      '@proj-airi/three-scene':
+        specifier: workspace:^
+        version: link:../../packages/three-scene
       '@proj-airi/ui':
         specifier: workspace:^
         version: link:../../packages/ui
@@ -1577,22 +1580,6 @@ importers:
         specifier: ^4.20.5
         version: 4.20.5
 
-  packages/renderer-three:
-    dependencies:
-      '@tresjs/core':
-        specifier: ^4.3.6
-        version: 4.3.6(three@0.179.1)(typescript@5.9.2)(vue@3.5.21(typescript@5.9.2))
-      '@vueuse/core':
-        specifier: ^13.9.0
-        version: 13.9.0(vue@3.5.21(typescript@5.9.2))
-      vue:
-        specifier: ^3.5.21
-        version: 3.5.21(typescript@5.9.2)
-    devDependencies:
-      vue-tsc:
-        specifier: ^3.0.6
-        version: 3.0.6(typescript@5.9.2)
-
   packages/server-runtime:
     dependencies:
       '@guiiai/logg':
@@ -1712,15 +1699,15 @@ importers:
       '@proj-airi/i18n':
         specifier: workspace:^
         version: link:../i18n
-      '@proj-airi/renderer-three':
-        specifier: workspace:^
-        version: link:../renderer-three
       '@proj-airi/server-sdk':
         specifier: workspace:^
         version: link:../server-sdk
       '@proj-airi/tauri-plugin-mcp':
         specifier: workspace:^
         version: link:../tauri-plugin-mcp
+      '@proj-airi/three-scene':
+        specifier: workspace:^
+        version: link:../three-scene
       '@proj-airi/ui':
         specifier: workspace:^
         version: link:../ui
@@ -1996,6 +1983,55 @@ importers:
       pkgroll:
         specifier: ^2.15.3
         version: 2.15.3(typescript@5.9.2)
+
+  packages/three-scene:
+    dependencies:
+      '@pixiv/three-vrm':
+        specifier: ^3.4.2
+        version: 3.4.2(three@0.179.1)
+      '@pixiv/three-vrm-animation':
+        specifier: ^3.4.2
+        version: 3.4.2(three@0.179.1)
+      '@pixiv/three-vrm-core':
+        specifier: ^3.4.2
+        version: 3.4.2(three@0.179.1)
+      '@tresjs/cientos':
+        specifier: ^4.3.1
+        version: 4.3.1(@tresjs/core@4.3.6(three@0.179.1)(typescript@5.9.2)(vue@3.5.21(typescript@5.9.2)))(@types/three@0.179.0)(react@18.3.1)(three@0.179.1)(typescript@5.9.2)(vue@3.5.21(typescript@5.9.2))
+      '@tresjs/core':
+        specifier: ^4.3.6
+        version: 4.3.6(three@0.179.1)(typescript@5.9.2)(vue@3.5.21(typescript@5.9.2))
+      '@tresjs/post-processing':
+        specifier: ^2.4.0
+        version: 2.4.0(@tresjs/core@4.3.6(three@0.179.1)(typescript@5.9.2)(vue@3.5.21(typescript@5.9.2)))(three@0.179.1)(typescript@5.9.2)(vue@3.5.21(typescript@5.9.2))
+      '@vueuse/core':
+        specifier: ^13.9.0
+        version: 13.9.0(vue@3.5.21(typescript@5.9.2))
+      culori:
+        specifier: ^4.0.2
+        version: 4.0.2
+      pinia:
+        specifier: ^3.0.3
+        version: 3.0.3(typescript@5.9.2)(vue@3.5.21(typescript@5.9.2))
+      postprocessing:
+        specifier: ^6.37.7
+        version: 6.37.7(three@0.179.1)
+      three:
+        specifier: ^0.179.1
+        version: 0.179.1
+      vue:
+        specifier: ^3.5.21
+        version: 3.5.21(typescript@5.9.2)
+    devDependencies:
+      '@types/culori':
+        specifier: ^4.0.1
+        version: 4.0.1
+      '@types/three':
+        specifier: ^0.179.0
+        version: 0.179.0
+      vue-tsc:
+        specifier: ^3.0.6
+        version: 3.0.6(typescript@5.9.2)
 
   packages/ui:
     dependencies:
@@ -6536,9 +6572,6 @@ packages:
 
   '@rolldown/pluginutils@1.0.0-beta.34':
     resolution: {integrity: sha512-LyAREkZHP5pMom7c24meKmJCdhf2hEyvam2q0unr3or9ydwDL+DJ8chTF6Av/RFPb3rH8UFBdMzO5MxTZW97oA==}
-
-  '@rolldown/pluginutils@1.0.0-beta.37':
-    resolution: {integrity: sha512-0taU1HpxFzrukvWIhLRI4YssJX2wOW5q1MxPXWztltsQ13TE51/larZIwhFdpyk7+K43TH7x6GJ8oEqAo+vDbA==}
 
   '@rolldown/pluginutils@1.0.0-beta.38':
     resolution: {integrity: sha512-N/ICGKleNhA5nc9XXQG/kkKHJ7S55u0x0XUJbbkmdCnFuoRkM1Il12q9q0eX19+M7KKUEPw/daUPIRnxhcxAIw==}
@@ -18569,7 +18602,7 @@ snapshots:
 
   '@img/sharp-wasm32@0.33.5':
     dependencies:
-      '@emnapi/runtime': 1.4.5
+      '@emnapi/runtime': 1.5.0
     optional: true
 
   '@img/sharp-wasm32@0.34.3':
@@ -18916,9 +18949,9 @@ snapshots:
 
   '@napi-rs/wasm-runtime@0.2.12':
     dependencies:
-      '@emnapi/core': 1.4.5
-      '@emnapi/runtime': 1.4.5
-      '@tybys/wasm-util': 0.10.0
+      '@emnapi/core': 1.5.0
+      '@emnapi/runtime': 1.5.0
+      '@tybys/wasm-util': 0.10.1
     optional: true
 
   '@napi-rs/wasm-runtime@1.0.3':
@@ -20122,7 +20155,7 @@ snapshots:
 
   '@oxc-minify/binding-wasm32-wasi@0.80.0':
     dependencies:
-      '@napi-rs/wasm-runtime': 1.0.3
+      '@napi-rs/wasm-runtime': 1.0.5
     optional: true
 
   '@oxc-minify/binding-win32-arm64-msvc@0.80.0':
@@ -20169,7 +20202,7 @@ snapshots:
 
   '@oxc-parser/binding-wasm32-wasi@0.80.0':
     dependencies:
-      '@napi-rs/wasm-runtime': 1.0.3
+      '@napi-rs/wasm-runtime': 1.0.5
     optional: true
 
   '@oxc-parser/binding-win32-arm64-msvc@0.80.0':
@@ -20259,7 +20292,7 @@ snapshots:
 
   '@oxc-transform/binding-wasm32-wasi@0.80.0':
     dependencies:
-      '@napi-rs/wasm-runtime': 1.0.3
+      '@napi-rs/wasm-runtime': 1.0.5
     optional: true
 
   '@oxc-transform/binding-win32-arm64-msvc@0.80.0':
@@ -20913,8 +20946,6 @@ snapshots:
   '@rolldown/pluginutils@1.0.0-beta.29': {}
 
   '@rolldown/pluginutils@1.0.0-beta.34': {}
-
-  '@rolldown/pluginutils@1.0.0-beta.37': {}
 
   '@rolldown/pluginutils@1.0.0-beta.38': {}
 
@@ -22207,7 +22238,7 @@ snapshots:
       '@babel/core': 7.28.3
       '@babel/plugin-syntax-typescript': 7.27.1(@babel/core@7.28.3)
       '@babel/plugin-transform-typescript': 7.28.0(@babel/core@7.28.3)
-      '@rolldown/pluginutils': 1.0.0-beta.37
+      '@rolldown/pluginutils': 1.0.0-beta.38
       '@vue/babel-plugin-jsx': 1.5.0(@babel/core@7.28.3)
       vite: 7.1.4(@types/node@24.3.0)(jiti@2.5.1)(less@4.4.1)(lightningcss@1.30.1)(terser@5.43.1)(tsx@4.20.5)(yaml@2.8.1)
       vue: 3.5.21(typescript@5.9.2)
