@@ -49,7 +49,7 @@ import {
 
 } from 'vue'
 
-// From three-scene package
+// From stage-ui-three package
 import {
   clipFromVRMAnimation,
   loadVRMAnimation,
@@ -107,17 +107,17 @@ const props = withDefaults(defineProps<{
   *
 */
 const emit = defineEmits<{
-  (e: 'vrmModelLoadingProgress', value: number): void
-  (e: 'vrmModelLoadStart'): void
-  (e: 'vrmModelCameraPosition', value: Vec3): void
-  (e: 'vrmModelModelOrigin', value: Vec3): void
-  (e: 'vrmModelModelSize', value: Vec3): void
-  (e: 'vrmModelModelRotationY', value: number): void
-  (e: 'vrmModelEyeHeight', value: number): void
-  (e: 'vrmModelLookAtTarget', value: Vec3): void
+  (e: 'loadingProgress', value: number): void
+  (e: 'loadStart'): void
+  (e: 'cameraPosition', value: Vec3): void
+  (e: 'modelOrigin', value: Vec3): void
+  (e: 'modelSize', value: Vec3): void
+  (e: 'modelRotationY', value: number): void
+  (e: 'eyeHeight', value: number): void
+  (e: 'lookAtTarget', value: Vec3): void
 
-  (e: 'vrmModelError', value: unknown): void
-  (e: 'vrmModelLoaded', value: string): void
+  (e: 'error', value: unknown): void
+  (e: 'loaded', value: string): void
 }>()
 
 const {
@@ -238,14 +238,14 @@ async function loadModel() {
     const isFirstLoad = modelSrc.value !== lastModelSrc.value
 
     try {
-      emit('vrmModelLoadStart')
+      emit('loadStart')
       // Load vrm model
       modelLoaded.value = false
       const _vrmInfo = await loadVrm(modelSrc.value, {
         scene: scene.value,
         lookAt: true,
         onProgress: progress => emit(
-          'vrmModelLoadingProgress',
+          'loadingProgress',
           Number((100 * progress.loaded / progress.total).toFixed(2)),
         ),
       })
@@ -268,17 +268,17 @@ async function loadModel() {
       vrmGroup.value = _vrmGroup
       // If it's first load
       if (isFirstLoad) {
-        emit('vrmModelCameraPosition', {
+        emit('cameraPosition', {
           x: vrmModelCenter.x + vrmInitialCameraOffset.x,
           y: vrmModelCenter.y + vrmInitialCameraOffset.y,
           z: vrmModelCenter.z + vrmInitialCameraOffset.z,
         })
-        emit('vrmModelModelOrigin', {
+        emit('modelOrigin', {
           x: vrmModelCenter.x,
           y: vrmModelCenter.y,
           z: vrmModelCenter.z,
         })
-        emit('vrmModelModelSize', {
+        emit('modelSize', {
           x: vrmModelSize.x,
           y: vrmModelSize.y,
           z: vrmModelSize.z,
@@ -301,7 +301,7 @@ async function loadModel() {
 
       if (isFirstLoad) {
         // Reset model rotation Y
-        emit('vrmModelModelRotationY', 0)
+        emit('modelRotationY', 0)
       }
 
       /*
@@ -393,8 +393,8 @@ async function loadModel() {
       if (isFirstLoad) {
         const eyePositionY = getEyePosition()
         if (eyePositionY) {
-          emit('vrmModelEyeHeight', eyePositionY)
-          emit('vrmModelLookAtTarget', defaultTookAt(eyePositionY))
+          emit('eyeHeight', eyePositionY)
+          emit('lookAtTarget', defaultTookAt(eyePositionY))
         }
       }
 
@@ -409,17 +409,17 @@ async function loadModel() {
       }).off
 
       // update the 'last model src'
-      emit('vrmModelLoaded', modelSrc.value)
+      emit('loaded', modelSrc.value)
       modelLoaded.value = true
     }
     catch (err) {
       console.error(err)
-      emit('vrmModelError', err)
+      emit('error', err)
     }
   }
   catch (err) {
     console.error(err)
-    emit('vrmModelError', err)
+    emit('error', err)
   }
 }
 
@@ -486,18 +486,18 @@ onMounted(async () => {
     if (newMode === 'camera') {
       stopCameraWatch = watch(cameraPosition, (newPosition) => {
         // watch to update look at target to camera
-        emit('vrmModelLookAtTarget', newPosition)
+        emit('lookAtTarget', newPosition)
       }, { immediate: true, deep: true })
     }
     else if (newMode === 'mouse') {
       stopMouseWatch = watch([mouseX, mouseY], ([newX, newY]) => {
         mouseTarget.value = lookAtMouse(newX, newY, camera)
         // watch to update look at target to mouse
-        emit('vrmModelLookAtTarget', mouseTarget.value)
+        emit('lookAtTarget', mouseTarget.value)
       }, { immediate: true, deep: true })
     }
     else {
-      emit('vrmModelLookAtTarget', defaultTookAt(eyeHeight.value))
+      emit('lookAtTarget', defaultTookAt(eyeHeight.value))
     }
   }, { immediate: true })
   watch(lookAtTarget, (newTarget) => {

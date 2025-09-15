@@ -56,21 +56,21 @@ export type FieldValueOf<D> = D extends SelectField<infer T> ? T
 export const useModelStore = defineStore('modelStore', () => {
   // const defaultRootDir = 'settings/3d-model'
 
-  const scale = useLocalStorage('settings/three-scene/scale', 1)
-  const lastModelSrc = useLocalStorage('settings/three-scene/lastModelSrc', '')
+  const scale = useLocalStorage('settings/stage-ui-three/scale', 1)
+  const lastModelSrc = useLocalStorage('settings/stage-ui-three/lastModelSrc', '')
 
-  const modelSize = useLocalStorage('settings/three-scene/modelSize', { x: 0, y: 0, z: 0 })
-  const modelOrigin = useLocalStorage('settings/three-scene/modelOrigin', { x: 0, y: 0, z: 0 })
-  const modelOffset = useLocalStorage('settings/three-scene/modelOffset', { x: 0, y: 0, z: 0 })
-  const modelRotationY = useLocalStorage('settings/three-scene/modelRotationY', 0)
+  const modelSize = useLocalStorage('settings/stage-ui-three/modelSize', { x: 0, y: 0, z: 0 })
+  const modelOrigin = useLocalStorage('settings/stage-ui-three/modelOrigin', { x: 0, y: 0, z: 0 })
+  const modelOffset = useLocalStorage('settings/stage-ui-three/modelOffset', { x: 0, y: 0, z: 0 })
+  const modelRotationY = useLocalStorage('settings/stage-ui-three/modelRotationY', 0)
 
-  const cameraFOV = useLocalStorage('settings/three-scene/cameraFOV', 40)
-  const cameraPosition = useLocalStorage('settings/three-scene/camera-position', { x: 0, y: 0, z: -1 })
-  const cameraDistance = useLocalStorage('settings/three-scene/cameraDistance', 0)
+  const cameraFOV = useLocalStorage('settings/stage-ui-three/cameraFOV', 40)
+  const cameraPosition = useLocalStorage('settings/stage-ui-three/camera-position', { x: 0, y: 0, z: -1 })
+  const cameraDistance = useLocalStorage('settings/stage-ui-three/cameraDistance', 0)
 
-  const lookAtTarget = useLocalStorage('settings/three-scene/lookAtTarget', { x: 0, y: 0, z: 0 })
-  const trackingMode = useLocalStorage('settings/three-scene/trackingMode', 'none' as 'camera' | 'mouse' | 'none')
-  const eyeHeight = useLocalStorage('settings/three-scene/eyeHeight', 0)
+  const lookAtTarget = useLocalStorage('settings/stage-ui-three/lookAtTarget', { x: 0, y: 0, z: 0 })
+  const trackingMode = useLocalStorage('settings/stage-ui-three/trackingMode', 'none' as 'camera' | 'mouse' | 'none')
+  const eyeHeight = useLocalStorage('settings/stage-ui-three/eyeHeight', 0)
 
   function resetModelStore() {
     modelSize.value = { x: 0, y: 0, z: 0 }
@@ -88,9 +88,9 @@ export const useModelStore = defineStore('modelStore', () => {
   }
 
   // === Lighting ===
-  const directionalLightPosition = useLocalStorage('settings/three-scene/scenes/scene/directional-light/position', { x: 0, y: 0, z: -1 })
-  const directionalLightTarget = useLocalStorage('settings/three-scene/scenes/scene/directional-light/target', { x: 0, y: 0, z: 0 })
-  const directionalLightRotation = useLocalStorage('settings/three-scene/scenes/scene/directional-light/rotation', { x: 0, y: 0, z: 0 })
+  const directionalLightPosition = useLocalStorage('settings/stage-ui-three/scenes/scene/directional-light/position', { x: 0, y: 0, z: -1 })
+  const directionalLightTarget = useLocalStorage('settings/stage-ui-three/scenes/scene/directional-light/target', { x: 0, y: 0, z: 0 })
+  const directionalLightRotation = useLocalStorage('settings/stage-ui-three/scenes/scene/directional-light/rotation', { x: 0, y: 0, z: 0 })
   // TODO: Manual directional light intensity will not work for other
   //       scenes with different lighting setups. But since the model
   //       is possible to have MeshToonMaterial, and MeshBasicMaterial
@@ -103,21 +103,21 @@ export const useModelStore = defineStore('modelStore', () => {
   //             harsh shadows and bright highlights.
   // REVIEW: This is a temporary solution, and will be replaced with
   //         a more flexible lighting system in the future.
-  const directionalLightIntensity = useLocalStorage('settings/three-scene/scenes/scene/directional-light/intensity', 2.02)
+  const directionalLightIntensity = useLocalStorage('settings/stage-ui-three/scenes/scene/directional-light/intensity', 2.02)
   // TODO: color are the same
-  const directionalLightColor = useLocalStorage('settings/three-scene/scenes/scene/directional-light/color', '#fffbf5')
+  const directionalLightColor = useLocalStorage('settings/stage-ui-three/scenes/scene/directional-light/color', '#fffbf5')
 
-  const hemisphereSkyColor = useLocalStorage('settings/three-scene/scenes/scene/hemisphere-light/sky-color', '#FFFFFF')
-  const hemisphereGroundColor = useLocalStorage('settings/three-scene/scenes/scene/hemisphere-light/ground-color', '#222222')
-  const hemisphereLightIntensity = useLocalStorage('settings/three-scene/scenes/scene/hemisphere-light/intensity', 0.4)
+  const hemisphereSkyColor = useLocalStorage('settings/stage-ui-three/scenes/scene/hemisphere-light/sky-color', '#FFFFFF')
+  const hemisphereGroundColor = useLocalStorage('settings/stage-ui-three/scenes/scene/hemisphere-light/ground-color', '#222222')
+  const hemisphereLightIntensity = useLocalStorage('settings/stage-ui-three/scenes/scene/hemisphere-light/intensity', 0.4)
 
-  const ambientLightColor = useLocalStorage('settings/three-scene/scenes/scene/ambient-light/color', '#FFFFFF')
-  const ambientLightIntensity = useLocalStorage('settings/three-scene/scenes/scene/ambient-light/intensity', 0.6)
+  const ambientLightColor = useLocalStorage('settings/stage-ui-three/scenes/scene/ambient-light/color', '#FFFFFF')
+  const ambientLightIntensity = useLocalStorage('settings/stage-ui-three/scenes/scene/ambient-light/intensity', 0.6)
 
   // environment related setting
-  const envSelect = useLocalStorage('settings/three-scene/envEnabled', 'skyBox' as 'hemisphere' | 'skyBox')
-  const skyBoxSrc = useLocalStorage('settings/three-scene/skyBoxUrl', defaultSkyBoxSrc)
-  const skyBoxIntensity = useLocalStorage('settings/three-scene/skyBoxIntensity', 0.1)
+  const envSelect = useLocalStorage('settings/stage-ui-three/envEnabled', 'skyBox' as 'hemisphere' | 'skyBox')
+  const skyBoxSrc = useLocalStorage('settings/stage-ui-three/skyBoxUrl', defaultSkyBoxSrc)
+  const skyBoxIntensity = useLocalStorage('settings/stage-ui-three/skyBoxIntensity', 0.1)
 
   return {
     scale,

@@ -16,7 +16,7 @@ import {
   Vector3,
 } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-// From three-scene package
+// From stage-ui-three package
 import { onMounted, onUnmounted, shallowRef, toRefs, watch } from 'vue'
 
 /*

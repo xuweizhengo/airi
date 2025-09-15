@@ -1,11 +1,11 @@
 <script setup lang="ts">
 /*
   * ThreeScene.vue
-  * - Root vue component of three-scene package
+  * - Root vue component of stage-ui-three package
   * - This scene component the root for all the sub components in the 3d scene
-  * - This package, three-scene, is a stateful package
+  * - This package, stage-ui-three, is a stateful package
   * - Pinia store is used to store the data/configuration of the model, camera, lighting, etc.
-  * - Src of model is obtained from stage-ui via props, which is NOT a part of three-scene package
+  * - Src of model is obtained from stage-ui via props, which is NOT a part of stage-ui-three package
 */
 
 import type { TresContext } from '@tresjs/core'
@@ -30,7 +30,7 @@ import { onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
 
 // pinia store
 import { useModelStore } from '../stores/model-store'
-// From three-scene package
+// From stage-ui-three package
 import { OrbitControls } from './Controls'
 import { SkyBox } from './Environment'
 import { VRMModel } from './Model'
@@ -347,16 +347,16 @@ defineExpose({
         :camera-position="cameraPosition"
         :camera="camera"
 
-        @vrm-model-loading-progress="(val: number) => emit('loadModelProgress', val)"
-        @vrm-model-load-start="onVRMModelLoadStart"
-        @vrm-model-camera-position="onVRMModelCameraPosition"
-        @vrm-model-model-origin="onVRMModelModelOrigin"
-        @vrm-model-model-size="onVRMModelModelSize"
-        @vrm-model-model-rotation-y="onVRMModelRotationY"
-        @vrm-model-eye-height="onVRMModelEyeHeight"
-        @vrm-model-look-at-target="onVRMModelLookAtTarget"
-        @vrm-model-error="(err: unknown) => emit('error', err)"
-        @vrm-model-loaded="onVRMModelLoaded"
+        @loading-progress="(val: number) => emit('loadModelProgress', val)"
+        @load-start="onVRMModelLoadStart"
+        @camera-position="onVRMModelCameraPosition"
+        @model-origin="onVRMModelModelOrigin"
+        @model-size="onVRMModelModelSize"
+        @model-rotation-y="onVRMModelRotationY"
+        @eye-height="onVRMModelEyeHeight"
+        @look-at-target="onVRMModelLookAtTarget"
+        @error="(err: unknown) => emit('error', err)"
+        @loaded="onVRMModelLoaded"
       />
       <TresAxesHelper v-if="props.showAxes" :size="1" />
     </TresCanvas>
