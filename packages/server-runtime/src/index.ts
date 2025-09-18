@@ -1,7 +1,8 @@
 import type { WebSocketEvent } from '@proj-airi/server-shared/types'
 
-import type { AuthenticatedPeer, Peer } from './types'
+import type { AuthenticatedPeer } from './types'
 import { WebSocketReadyState } from './types'
+import type { Peer } from 'h3'
 
 import { env } from 'node:process'
 
@@ -21,7 +22,7 @@ const RESPONSES = {
 }
 
 // helper send function
-function send(peer: Peer, event: WebSocketEvent<Record<string, unknown>> | string) {
+function send(peer: any, event: WebSocketEvent<Record<string, unknown>> | string) {
   peer.send(typeof event === 'string' ? event : JSON.stringify(event))
 }
 
@@ -167,7 +168,9 @@ function main() {
       for (const [id, other] of peers.entries()) {
         if (id === peer.id)
           continue
-        if (other.peer.readyState === WebSocketReadyState.OPEN) {
+        // Check if peer is still open before sending
+        // @ts-ignore - readyState may not exist on h3 Peer type
+        if (!other.peer.readyState || other.peer.readyState === WebSocketReadyState.OPEN) {
           other.peer.send(payload)
         }
         else {

@@ -1,15 +1,7 @@
-export interface Peer {
-  /**
-   * Unique random [uuid v4](https://developer.mozilla.org/en-US/docs/Glossary/UUID) identifier for the peer.
-   */
-  get id(): string
-  send: (data: unknown, options?: {
-    compress?: boolean
-  }) => number | void | undefined
-  
-  /** WebSocket lifecycle state (mirrors WebSocket.readyState) */
-  readyState: number
-}
+// Use h3's Peer type instead
+import type { Peer as H3Peer } from 'h3'
+
+export type Peer = H3Peer
 
 export interface NamedPeer {
   name: string

@@ -126,3 +126,44 @@ The project supports extensive LLM providers through the xsAI library:
 - The project uses pnpm workspace catalogs for shared dependency versions
 - Rust code is in `/crates` and `/apps/stage-tamagotchi/src-tauri`
 - Services require environment configuration via `.env.local` files
+
+## GitHub Workflow & CI/CD
+
+### Fork Information
+- Main repository: `moeru-ai/airi`
+- My fork: `xuweizhengo/airi`
+- When working on PRs, changes should be pushed to my fork first
+
+### Monitoring GitHub Actions Builds
+Use GitHub CLI to monitor and fix build failures:
+
+```bash
+# List recent workflow runs
+gh run list --limit 5
+
+# View failed logs for a specific run
+gh run view <RUN_ID> --log-failed
+
+# Check PR status
+gh pr view <PR_NUMBER>
+
+# Watch a running workflow
+gh run watch <RUN_ID>
+```
+
+### Common Build Issues
+1. **ESLint errors**: Check for formatting issues, especially after if statements requiring newlines
+2. **TypeScript errors**: Verify type imports and enum usage
+3. **Test failures**: Run `pnpm test:run` locally before pushing
+
+### Working with PRs
+```bash
+# Checkout a PR for fixing
+gh pr checkout <PR_NUMBER>
+
+# After fixes, commit with --no-verify if lint-staged is not available
+git commit -m "fix: description" --no-verify
+
+# Push to fork
+git push origin <branch-name>
+```
