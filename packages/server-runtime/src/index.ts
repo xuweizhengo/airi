@@ -42,7 +42,12 @@ function main() {
     if (!peersByModule.has(name)) {
       peersByModule.set(name, new Map())
     }
-    peersByModule.get(name)!.set(index, p)
+    const group = peersByModule.get(name)!
+    if (group.has(index)) {
+      // log instead of silent overwrite
+      websocketLogger.withFields({ name, index }).debug('peer replaced for module')
+    }
+    group.set(index, p)
   }
 
   function unregisterModulePeer(p: AuthenticatedPeer) {
@@ -75,7 +80,8 @@ function main() {
         event = message.json() as WebSocketEvent
       }
       catch (err) {
-        send(peer, { type: 'error', data: { message: `invalid JSON, error: ${err.message}` } })
+        const errorMessage = err instanceof Error ? err.message : String(err)
+        send(peer, { type: 'error', data: { message: `invalid JSON, error: ${errorMessage}` } })
         return
       }
 
@@ -104,12 +110,16 @@ function main() {
               return
             }
             if (typeof index !== 'undefined') {
-              if (typeof index !== 'number' || index < 0) {
-                send(peer, { type: 'error', data: { message: 'the field \'index\' must be a non-negative number for event \'module:announce\'' } })
+              if (!Number.isInteger(index) || index < 0) {
+                send(peer, { type: 'error', data: { message: 'the field \'index\' must be a non-negative integer for event \'module:announce\'' } })
                 return
               }
             }
-            Object.assign(p, { authenticated: true, name, index })
+            if (AUTH_TOKEN && !p.authenticated) {
+              send(peer, { type: 'error', data: { message: 'must authenticate before announcing' } })
+              return
+            }
+            Object.assign(p, { name, index })
             registerModulePeer(p, p.name, p.index)
           }
           return
@@ -126,9 +136,11 @@ function main() {
             send(peer, { type: 'error', data: { message: 'the field \'moduleIndex\' must be a number for event \'ui:configure\'' } })
             return
           }
-          if (typeof moduleIndex !== 'undefined' && moduleIndex < 0) {
-            send(peer, { type: 'error', data: { message: 'the field \'moduleIndex\' must be a positive number for event \'ui:configure\'' } })
-            return
+          if (typeof moduleIndex !== 'undefined') {
+            if (!Number.isInteger(moduleIndex) || moduleIndex < 0) {
+              send(peer, { type: 'error', data: { message: 'the field \'moduleIndex\' must be a non-negative integer for event \'ui:configure\'' } })
+              return
+            }
           }
 
           const target = peersByModule.get(moduleName)?.get(moduleIndex)
@@ -136,7 +148,7 @@ function main() {
             send(target.peer, { type: 'module:configure', data: { config } })
           }
           else {
-            send(peer, { type: 'error', data: { message: 'module not found, it haven\'t announced it or the name was wrong' } })
+            send(peer, { type: 'error', data: { message: 'module not found, it hasn\'t announced itself or the name is incorrect' } })
           }
           return
         }
@@ -152,8 +164,13 @@ function main() {
 
       const payload = JSON.stringify(event)
       for (const [id, other] of peers.entries()) {
-        if (id !== peer.id) {
+        if (id === peer.id) continue
+        if (other.peer.readyState === other.peer.OPEN) {
           other.peer.send(payload)
+        }
+        else {
+          peers.delete(id)
+          unregisterModulePeer(other)
         }
       }
     },
