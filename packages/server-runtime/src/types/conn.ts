@@ -17,7 +17,7 @@ export interface NamedPeer {
   peer: Peer
 }
 
-export const enum WebSocketReadyState {
+export enum WebSocketReadyState {
   CONNECTING = 0,
   OPEN = 1,
   CLOSING = 2,
